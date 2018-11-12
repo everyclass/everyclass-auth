@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-from passlib.apps import custom_app_context as pwd_context
 from everyclass.auth.db.mysql import *
 from everyclass.auth.utils import json_payload
 from auth.redisdb import redis_client, RedisQueue

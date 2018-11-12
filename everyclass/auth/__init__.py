@@ -1,5 +1,6 @@
-from flask import Flask
+import sys
 
+from flask import Flask
 import logbook
 from elasticapm.contrib.flask import ElasticAPM
 from raven.contrib.flask import Sentry
@@ -10,7 +11,10 @@ logger = logbook.Logger(__name__)
 sentry = Sentry()
 
 
-def create_app():
+def create_app(offline=False):
+    from everyclass.utils.logbook_logstash.handler import LogstashHandler
+    from everyclass.utils.logbook_logstash.formatter import LOG_FORMAT_STRING
+
     app = Flask(__name__)
 
     # load app config
