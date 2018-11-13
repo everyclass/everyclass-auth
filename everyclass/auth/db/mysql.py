@@ -40,7 +40,7 @@ def insert_email_account(request_id, username, method, token):
     db = pymysql.connect("localhost", "root", "root", "everyclass_login")
     cursor = db.cursor()
     sql = "INSERT INTO account(request_id, username, method, token) " \
-          "VALUES(%d, \'%s\', \'%s\', \'%s\')" \
+          "VALUES( \'%s\', \'%s\', \'%s\', \'%s\')" \
           % (int(request_id), username, method, token)
     print(sql)
     cursor.execute(sql)
@@ -52,7 +52,7 @@ def insert_browser_account(request_id, username, method):
     """插入一个用户信息"""
     db = pymysql.connect("localhost", "root", "root", "everyclass_login")
     cursor = db.cursor()
-    sql = "INSERT INTO account(request_id, username, method, identifying) VALUES(%d, \'%s\', \'%s\')" \
+    sql = "INSERT INTO account(request_id, username, method, identifying) VALUES( \'%s\', \'%s\', \'%s\')" \
           % (int(request_id), username, method)
     print(sql)
     cursor.execute(sql)

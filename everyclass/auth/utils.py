@@ -14,7 +14,7 @@ from selenium import webdriver
 from PIL import Image
 
 from everyclass.auth.db.mysql import *
-from everyclass.auth.redisdb import redis_client
+from everyclass.auth.handle_register_queue import redis_client
 
 
 def json_payload(*fields, supposed_type=None, supposed_in=None):
@@ -44,7 +44,6 @@ def json_payload(*fields, supposed_type=None, supposed_in=None):
         return _wrapped
 
     return decorator
-
 
 
 def send_email(email, token):
@@ -77,7 +76,6 @@ def send_email(email, token):
     smtpObj.login(mail_user, mail_pass)
     smtpObj.sendmail(sender, receivers, message.as_string())
     smtpObj.quit()
-
 
 
 def simulate_login(username: str, password: str):
@@ -170,11 +168,11 @@ def handle_email_register_request(request_id: str, username: str):
     :param request_id: str, 请求 ID
     :param username: str, 学号
     """
-    email = str(username) + "@csu.edu.cn"
-    token = str(uuid.uuid1())
+    email = username + "@csu.edu.cn"
+    token = uuid.uuid1()
     send_email(email, token)
     redis_client.set("auth:request_status" + request_id, 'sendEmail success', nx=True, ex=86400)
-    request_info = str(request_id) + ':' + str(username)
+    request_info = "%s:%s" % (request_id, username)
     redis_client.set("auth:email_token:%s" % token, request_info, ex=86400)
     return True, 'sendEmail success'
 
