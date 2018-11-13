@@ -98,8 +98,7 @@ def identifying_email_code():
     else:
         insert_email_account(request_id, username, 'email', token)
         return jsonify({
-            'success': True,
-            'message': 'token match'
+            'success': True
         })
 
 
@@ -118,8 +117,7 @@ def login():
     username = request.json.get('username')
     password = request.json.get('password')
 
-    return jsonify({'success': True,
-                    'message': 'Login success'})
+    return jsonify({'success': True})
 
 
 @user_blueprint.route('/get_identifying_result', methods=['POST'])
