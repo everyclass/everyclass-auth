@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from everyclass.auth.db.mysql import *
 from everyclass.auth.utils import json_payload
-from auth.redisdb import redis_client, RedisQueue
+from auth.handle_register_queue import redis_client, RedisQueue
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/user')
 
@@ -86,9 +86,10 @@ def identifying_email_code():
         })
     token = email_code
     print(redis_client.get(token))
+    # 取到的token格式为auth:email_token:request_id:username
     user_inf = bytes.decode(redis_client.get(token)).split(':')
-    request_id = user_inf[0]
-    username = user_inf[1]
+    request_id = user_inf[2]
+    username = user_inf[3]
     if not request_id:
         return jsonify({
             'success': False,
@@ -132,7 +133,8 @@ def get_identifying_result():
             }
     """
     request_id = request.json.get('request_id')
-    message = redis_client.get(request_id)
+    # 通过redis取出的信息格式为auth:request_state:message
+    message = redis_client.get(request_id).split(':')[2]
     return message
 
 

@@ -54,6 +54,7 @@ def create_app(offline=False):
     stderr_handler = logbook.StreamHandler(stream=sys.stderr, bubble=True, level='WARNING')
     stderr_handler.format_string = LOG_FORMAT_STRING
     logger.handlers.append(stderr_handler)
+    print("456")
 
     if not offline and (app.config['CONFIG_NAME'] in ["production", "staging", "testing"]):
         # Sentry
@@ -63,7 +64,6 @@ def create_app(offline=False):
 
         # Elastic APM
         ElasticAPM(app)
-
         # Log to Logstash
         logstash_handler = LogstashHandler(host=app.config['LOGSTASH']['HOST'],
                                            port=app.config['LOGSTASH']['PORT'],
@@ -73,4 +73,5 @@ def create_app(offline=False):
 
     from everyclass.auth.user import user_blueprint
     app.register_blueprint(user_blueprint)
+
     return app

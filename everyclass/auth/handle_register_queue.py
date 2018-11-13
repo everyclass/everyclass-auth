@@ -2,10 +2,17 @@ import json
 import re
 import time
 from everyclass.auth.utils import handle_email_register_request, handle_browser_register_request
-from everyclass.auth.redisdb import redis_client
+
+
+import redis
+pool = redis.ConnectionPool(host='127.0.0.1', port=6379)
+redis_client = redis.Redis(connection_pool=pool)
 
 
 class RedisQueue(object):
+    """
+    redis队列类
+    """
     def __init__(self, name, namespace='queue'):
         # redis的默认参数为：host='localhost', port=6379, db=0， 其中db为定义redis database的数量
         self.__db = redis_client
@@ -28,9 +35,15 @@ class RedisQueue(object):
         return item
 
 
-if __name__ == "__main__":
+def start_register_queue():
+    """
+    启动用于缓存用户请求的队列
+    如果为空则等待至有元素被加入队列
+    并通过请求不同的验证方式调用不同的处理函数
+    """
     user_queue = RedisQueue('everyclass')
     while True:
+        print('p1 start')
         # 队列返回的第一个参数为频道名，第二个参数为存入的值
         result = user_queue.get_wait()[1]
         print(result)
@@ -47,6 +60,14 @@ if __name__ == "__main__":
             handle_email_register_request(user_inf['request_id'], user_inf['username'])
 
         time.sleep(2)
+
+
+if __name__ == "__main__":
+    start_register_queue()
+
+
+
+
 
 
 
