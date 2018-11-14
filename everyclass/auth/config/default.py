@@ -6,7 +6,7 @@ class Config(object):
     """
     Basic Configurations
     """
-    DEBUG = True
+    DEBUG = False
     SECRET_KEY = 'development_key'
     MYSQL_CONFIG = {
         'user'       : 'database_user',

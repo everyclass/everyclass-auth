@@ -54,7 +54,7 @@ def create_app(offline=False):
     stderr_handler = logbook.StreamHandler(stream=sys.stderr, bubble=True, level='WARNING')
     stderr_handler.format_string = LOG_FORMAT_STRING
     logger.handlers.append(stderr_handler)
-    print("456")
+
 
     if not offline and (app.config['CONFIG_NAME'] in ["production", "staging", "testing"]):
         # Sentry
@@ -74,4 +74,5 @@ def create_app(offline=False):
     from everyclass.auth.user import user_blueprint
     app.register_blueprint(user_blueprint)
 
+    logger.info('App created with `{0}` config'.format(app.config['CONFIG_NAME']))
     return app

@@ -1,12 +1,9 @@
 import json
 import re
 import time
+
+from everyclass.auth.db.redisdb import redis_client
 from everyclass.auth.utils import handle_email_register_request, handle_browser_register_request
-
-
-import redis
-pool = redis.ConnectionPool(host='127.0.0.1', port=6379)
-redis_client = redis.Redis(connection_pool=pool)
 
 
 class RedisQueue(object):
@@ -60,11 +57,6 @@ def start_register_queue():
             handle_email_register_request(user_inf['request_id'], user_inf['username'])
 
         time.sleep(2)
-
-
-if __name__ == "__main__":
-    start_register_queue()
-
 
 
 

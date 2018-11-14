@@ -2,7 +2,7 @@ from .default import Config
 
 
 class DevelopmentConfig(Config):
-    DEBUG = True
+    DEBUG = False
     SECRET_KEY = 'development key'
 
     # Sentry
@@ -21,13 +21,13 @@ class DevelopmentConfig(Config):
 
     # Database config
     MYSQL_CONFIG = {
+        # 'user'       : 'root',
+        # 'password': ',G(mvC4ocooZt)KjGt',
         'user'       : 'root',
-        'password': ',G(mvC4ocooZt)KjGt',
-        # 'user'       : 'everyclass',
-        # 'password'   : 'password',
+        'password'   : 'root',
         'host'       : '127.0.0.1',
         'port'       : 3306,
-        'database'   : 'everyclass',
+        'database'   : 'everyclass_login',
         'use_unicode': True,
         'charset'    : 'utf8mb4'
     }
@@ -37,3 +37,9 @@ class DevelopmentConfig(Config):
         'SECRET_TOKEN': 'token',
         'SERVER_URL'  : 'http://10.140.0.2:8200',
     }
+
+    REDIS_CONFIG = {
+        'host': '127.0.0.1',
+        'port': 6379,
+    }
+

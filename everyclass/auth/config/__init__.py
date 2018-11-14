@@ -24,19 +24,19 @@ def get_config():
 
         try:
             if mode == 'PRODUCTION':
-                from everyclass.api_server.config.production import ProductionConfig
+                from everyclass.auth.config.production import ProductionConfig
                 _override_config = ProductionConfig
                 MixedConfig.CONFIG_NAME = 'production'
             elif mode == 'DEVELOPMENT':
-                from everyclass.api_server.config.development import DevelopmentConfig
+                from everyclass.auth.config.development import DevelopmentConfig
                 _override_config = DevelopmentConfig
                 MixedConfig.CONFIG_NAME = 'development'
             elif mode == 'STAGING':
-                from everyclass.api_server.config.staging import StagingConfig
+                from everyclass.auth.config.staging import StagingConfig
                 _override_config = StagingConfig
                 MixedConfig.CONFIG_NAME = 'staging'
             elif mode == 'TESTING':
-                from everyclass.api_server.config.testing import TestingConfig
+                from everyclass.auth.config.testing import TestingConfig
                 _override_config = TestingConfig
                 MixedConfig.CONFIG_NAME = 'testing'
             else:
