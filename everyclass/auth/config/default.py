@@ -22,7 +22,9 @@ class Config(object):
     Git Hash
     """
     _git_repo = git.Repo(search_parent_directories=True)
+    # GIT_HASH = _git_repo.head.object.hexsha
     GIT_HASH = _git_repo.head.object.hexsha
+    # 咋乱码了
     try:
         GIT_BRANCH_NAME = _git_repo.active_branch.name
     except TypeError:
