@@ -15,6 +15,7 @@ from PIL import Image
 
 from everyclass.auth.db.mysql import *
 from everyclass.auth.handle_register_queue import redis_client
+from everyclass.auth.config import logger
 
 
 def json_payload(*fields, supposed_type=None, supposed_in=None):
@@ -145,6 +146,7 @@ def handle_browser_register_request(request_id: str, username: str, password: st
     """
     if check_if_have_registered(username):
         redis_client.set("auth:request_status:%s" % request_id, 'student has registered', nx=True, ex=86400)
+        logger.info('student_id:%s identify fail becacuse id has registered' % username)
         return False, 'student has registered'
 
     # 判断该用户是否为中南大学学生
@@ -153,11 +155,13 @@ def handle_browser_register_request(request_id: str, username: str, password: st
     # 密码错误
     if not result[0]:
         redis_client.set("auth:request_status:%s" % request_id, 'password wrong', nx=True, ex=86400)
+        logger.info('student_id:%s identify fail because password wrong' % username)
         return False, result[1]
 
     # 经判断是中南大学学生，生成token，并将相应数据持久化
     redis_client.set("auth:request_status:%s" % request_id, 'identify a student in csu', nx=True, ex=86400)  # 1 day
     insert_browser_account(request_id, username, 'browser')
+    logger.info('student_id:%s identify a student in csu by password' % username)
     return True, 'identify a student in csu'
 
 
@@ -169,7 +173,7 @@ def handle_email_register_request(request_id: str, username: str):
     :param username: str, 学号
     """
     email = username + "@csu.edu.cn"
-    token = uuid.uuid1()
+    token = str(uuid.uuid1())
     send_email(email, token)
     redis_client.set("auth:request_status" + request_id, 'sendEmail success', nx=True, ex=86400)
     request_info = "%s:%s" % (request_id, username)

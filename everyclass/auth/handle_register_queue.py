@@ -3,6 +3,7 @@ import re
 import time
 
 from everyclass.auth.db.redisdb import redis_client
+from everyclass.auth import logger
 from everyclass.auth.utils import handle_email_register_request, handle_browser_register_request
 
 
@@ -51,8 +52,8 @@ def start_register_queue():
         user_inf = json.loads(user_inf_str)
 
         if user_inf['method'] == 'browser':
-            handle_browser_register_request(user_inf['request_id'], user_inf['username'], user_inf['password'])
-
+            r = handle_browser_register_request(user_inf['request_id'], user_inf['username'], user_inf['password'])
+            print(r)
         if user_inf['method'] == 'email':
             handle_email_register_request(user_inf['request_id'], user_inf['username'])
 

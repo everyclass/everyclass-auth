@@ -130,9 +130,12 @@ def get_identifying_result():
                 "request_id":"123"
             }
     """
-    request_id = request.json.get('request_id')
+    request_id = str(request.json.get('request_id'))
+    print(request_id)
+    print(type(request_id))
     # 通过redis取出的信息格式为auth:request_state:message
-    message = redis_client.get(request_id).split(':')[2]
+    print(redis_client.get(request_id))
+    message = (redis_client.get(request_id)).split(':')[2]
     return message
 
 
