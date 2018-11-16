@@ -41,7 +41,7 @@ def start_register_queue():
     """
     user_queue = RedisQueue('everyclass')
     while True:
-        print('queue start')
+        logger.info('RedisQueue start')
         # 队列返回的第一个参数为频道名，第二个参数为存入的值
         result = user_queue.get_wait()[1]
         if not result:

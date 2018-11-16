@@ -135,7 +135,7 @@ def select_username_by_token(token):
 
 
 if __name__ == '__main__':
-    print(123)
+    print(select_username_by_token('123'))
 
 
 
