@@ -16,6 +16,9 @@ from PIL import Image
 from everyclass.auth.db.mysql import *
 from everyclass.auth.handle_register_queue import redis_client
 from everyclass.auth.config import logger
+from everyclass.auth.config import get_config
+
+config = get_config()
 
 
 def json_payload(*fields, supposed_type=None, supposed_in=None):
@@ -55,11 +58,11 @@ def send_email(email, token):
     """
     # 第三方 SMTP 服务
     # mail_host = app.config['EMAIL_HOST']
-    mail_host = "smtp.mailgun.org"  # 设置服务器
-    mail_user = "verification@mail.everyclass.xyz"  # 用户名
-    mail_pass = "i6JdAYjwHrDmVErUAtEJ"  # 口令
+    mail_host = config.EMAIL['mail_host']  # 设置服务器
+    mail_user = config.EMAIL['mail_user']  # 用户名
+    mail_pass = config.EMAIL['mail_pass']  # 口令
 
-    sender = 'verification@mail.everyclass.xyz'
+    sender = config.EMAIL['sender']
     receivers = email
     message = MIMEText(token, 'html', 'utf-8')
     # message['From'] = Header("每课 <verification@mail.everyclass.xyz>", charset='utf-8').encode()
@@ -69,7 +72,7 @@ def send_email(email, token):
     message['Subject'] = Header('每课@CSU 学生身份验证', charset='utf-8').encode()
 
     smtpObj = smtplib.SMTP()
-    smtpObj.connect(mail_host, 2525)  # SMTP 端口号
+    smtpObj.connect(mail_host, config.EMAIL['SMTP_port'])  # SMTP 端口号
 
     smtpObj.ehlo()
     smtpObj.starttls()
@@ -136,7 +139,8 @@ def simulate_login(username: str, password: str):
             return False, 'password wrong'
         identifying_time = identifying_time + 1
     # 验证码识别多次后仍然失败
-    return False, 'identifying too much'
+    logger.warning('identifying code mistakes too much times')
+    return False, 'identifying code mistakes too much times'
 
 
 def handle_browser_register_request(request_id: str, username: str, password: str):
@@ -144,6 +148,7 @@ def handle_browser_register_request(request_id: str, username: str, password: st
     处理redis队列中的通过浏览器验证的请求
 
     """
+    print("handle request")
     if check_if_have_registered(username):
         redis_client.set("auth:request_status:%s" % request_id, 'student has registered', nx=True, ex=86400)
         logger.info('student_id:%s identify fail becacuse id has registered' % username)
@@ -161,7 +166,6 @@ def handle_browser_register_request(request_id: str, username: str, password: st
     # 经判断是中南大学学生，生成token，并将相应数据持久化
     redis_client.set("auth:request_status:%s" % request_id, 'identify a student in csu', nx=True, ex=86400)  # 1 day
     insert_browser_account(request_id, username, 'browser')
-    logger.info('student_id:%s identify a student in csu by password' % username)
     return True, 'identify a student in csu'
 
 

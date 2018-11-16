@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from everyclass.auth.db.mysql import *
 from everyclass.auth.utils import json_payload
 from auth.handle_register_queue import redis_client, RedisQueue
-
+from everyclass.auth import logger
 user_blueprint = Blueprint('user', __name__, url_prefix='/user')
 
 
@@ -24,8 +24,10 @@ def register_by_password():
     password = request.json.get('password')
 
     user_queue = RedisQueue('everyclass')
-    user_information = {"request_id": request_id, "username": username, "method": "email"}
+    user_information = {"request_id": request_id, "username": username, "password": password, "method": "password"}
     user_queue.put(user_information)
+
+    logger.info('stuent_id:%s request registering by password' % username)
 
     return jsonify({
         "success": True,
@@ -54,13 +56,7 @@ def register_by_email():
     user_information = {"request_id": request_id, "username": username, "method": "email"}
     user_queue.put(user_information)
 
-    # if user_sum < 50:
-    #
-    # else:
-    #     return jsonify({
-    #         'success': False,
-    #         'message': 'request too much'
-    #     })
+    logger.info('stuent_id:%s request registering by email' % username)
 
     return jsonify({
         "success": True,
@@ -69,7 +65,7 @@ def register_by_email():
 
 
 @user_blueprint.route('/identifying_email_code', methods=['POST'])
-@json_payload('email_code', supposed_type=str)
+@json_payload('token', supposed_type=str)
 def identifying_email_code():
     """
         从用户输入的code判断，该用户是否有注册资格
@@ -78,46 +74,28 @@ def identifying_email_code():
             "email_code": "asdda451"
         }
     """
-    email_code = request.json.get('email_code')
-    if not email_code:
+    token = request.json.get('token')
+    if not token:
         return jsonify({
             'success': False,
             'message': 'no token in request'
         })
-    token = email_code
-    print(redis_client.get(token))
-    # 取到的token格式为auth:email_token:request_id:username
+    user_inf_by_token = redis_client.get(token)
+    if not user_inf_by_token:
+        logger.info('no user for token %s' % token)
+        return jsonify({
+            'success': False,
+            'message': 'no user for token'
+        })
+    # 通过的token取到的数据格式为auth:email_token:request_id:username
     user_inf = bytes.decode(redis_client.get(token)).split(':')
     request_id = user_inf[2]
     username = user_inf[3]
-    if not request_id:
-        return jsonify({
-            'success': False,
-            'message': 'no token in db'
-        })
-    else:
-        insert_email_account(request_id, username, 'email', token)
-        return jsonify({
-            'success': True
-        })
-
-
-@user_blueprint.route('/login', methods=['POST'])
-@json_payload('username', 'password', supposed_type=str)
-def login():
-    """
-        登陆
-
-        期望格式：
-        {
-            "username":"username",
-            "password":"password"
-        }
-    """
-    username = request.json.get('username')
-    password = request.json.get('password')
-
-    return jsonify({'success': True})
+    insert_email_account(request_id, username, 'email', token)
+    logger.info('student_id:%s request success' % username)
+    return jsonify({
+        'success': True
+    })
 
 
 @user_blueprint.route('/get_identifying_result', methods=['POST'])
@@ -131,10 +109,7 @@ def get_identifying_result():
             }
     """
     request_id = str(request.json.get('request_id'))
-    print(request_id)
-    print(type(request_id))
     # 通过redis取出的信息格式为auth:request_state:message
-    print(redis_client.get(request_id))
     message = (redis_client.get(request_id)).split(':')[2]
     return message
 

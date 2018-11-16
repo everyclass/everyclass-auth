@@ -8,14 +8,25 @@ class Config(object):
     """
     DEBUG = False
     SECRET_KEY = 'development_key'
+    # MYSQL_CONFIG = {
+    #     'user'       : 'database_user',
+    #     'password'   : 'database_password',
+    #     'host'       : '127.0.0.1',
+    #     'port'       : '6666',
+    #     'database'   : 'everyclass',
+    #     'use_unicode': True,
+    #     'charset'    : 'utf8mb4'
+    # }
     MYSQL_CONFIG = {
-        'user'       : 'database_user',
-        'password'   : 'database_password',
-        'host'       : '127.0.0.1',
-        'port'       : '6666',
-        'database'   : 'everyclass',
+        # 'user'       : 'root',
+        # 'password': ',G(mvC4ocooZt)KjGt',
+        'user': 'root',
+        'password': 'root',
+        'host': 'localhost',
+        'port': 3306,
+        'db': 'everyclass_login',
         'use_unicode': True,
-        'charset'    : 'utf8mb4'
+        'charset': 'utf8mb4'
     }
 
     """
@@ -52,6 +63,18 @@ class Config(object):
     LOGSTASH = {
         'HOST': '127.0.0.1',
         'PORT': 8888
+    }
+
+    """
+    邮件SMTP服务相关设置
+    """
+    EMAIL = {
+        'mail_host': 'smtp.mailgun.org',
+        'mail_user': 'verification@mail.everyclass.xyz',
+        'mail_pass': 'i6JdAYjwHrDmVErUAtEJ',
+        'sender':    'verification@mail.everyclass.xyz',
+        'SMTP_port': 2525
+
     }
 
     """

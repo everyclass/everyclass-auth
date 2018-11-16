@@ -25,9 +25,9 @@ class DevelopmentConfig(Config):
         # 'password': ',G(mvC4ocooZt)KjGt',
         'user'       : 'root',
         'password'   : 'root',
-        'host'       : '127.0.0.1',
+        'host'       : 'localhost',
         'port'       : 3306,
-        'database'   : 'everyclass_login',
+        'db'   : 'everyclass_login',
         'use_unicode': True,
         'charset'    : 'utf8mb4'
     }

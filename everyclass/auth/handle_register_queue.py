@@ -41,19 +41,16 @@ def start_register_queue():
     """
     user_queue = RedisQueue('everyclass')
     while True:
-        print('p1 start')
+        print('queue start')
         # 队列返回的第一个参数为频道名，第二个参数为存入的值
         result = user_queue.get_wait()[1]
-        print(result)
         if not result:
             continue
         user_inf_str = bytes.decode(result)
         user_inf_str = re.sub('\'', '\"', user_inf_str)
         user_inf = json.loads(user_inf_str)
-
-        if user_inf['method'] == 'browser':
-            r = handle_browser_register_request(user_inf['request_id'], user_inf['username'], user_inf['password'])
-            print(r)
+        if user_inf['method'] == 'password':
+            handle_browser_register_request(user_inf['request_id'], user_inf['username'], user_inf['password'])
         if user_inf['method'] == 'email':
             handle_email_register_request(user_inf['request_id'], user_inf['username'])
 
