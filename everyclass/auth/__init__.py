@@ -12,6 +12,7 @@ sentry = Sentry()
 
 
 def create_app(offline=False):
+    print('call create_app')
     from everyclass.utils.logbook_logstash.handler import LogstashHandler
     from everyclass.utils.logbook_logstash.formatter import LOG_FORMAT_STRING
 

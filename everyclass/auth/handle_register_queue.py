@@ -39,6 +39,7 @@ def start_register_queue():
     如果为空则等待至有元素被加入队列
     并通过请求不同的验证方式调用不同的处理函数
     """
+    print('call start register queue')
     user_queue = RedisQueue('everyclass')
     while True:
         logger.info('RedisQueue start')

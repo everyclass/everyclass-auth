@@ -117,11 +117,11 @@ def simulate_login(username: str, password: str):
                identifying_pic.rect['y'],
                identifying_pic.rect['x'] + identifying_pic.rect['width'] - 100,
                identifying_pic.rect['y'] + identifying_pic.rect['height'])
-        driver.save_screenshot("everyclass/auth/pic/01.png")  # 截取屏幕内容，保存到本地
+        driver.save_screenshot("everyclass/auth/pic/system_screenshot.png")  # 截取屏幕内容，保存到本地
         # 打开截图，获取验证码位置，截取保存验证码
-        img1 = Image.open("everyclass/auth/pic/01.png")
+        img1 = Image.open("everyclass/auth/pic/system_screenshot.png")
         identifying_pic = img1.crop(box)
-        identifying_pic.save("everyclass/auth/pic/02.png")
+        identifying_pic.save("everyclass/auth/pic/code_screenshot.png")
         # 获取验证码图片，读取验证码
         identifying_code = pytesseract.image_to_string(identifying_pic)
         print(identifying_code)
