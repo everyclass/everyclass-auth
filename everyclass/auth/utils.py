@@ -15,7 +15,7 @@ from PIL import Image
 
 from everyclass.auth.db.mysql import *
 from everyclass.auth.handle_register_queue import redis_client
-from everyclass.auth.config import logger
+from everyclass.auth import logger
 from everyclass.auth.config import get_config
 
 config = get_config()
@@ -148,7 +148,7 @@ def handle_browser_register_request(request_id: str, username: str, password: st
     处理redis队列中的通过浏览器验证的请求
 
     """
-    print("handle request")
+    print('调用handlerbrowse')
     if check_if_have_registered(username):
         redis_client.set("auth:request_status:%s" % request_id, 'student has registered', nx=True, ex=86400)
         logger.info('student_id:%s identify fail becacuse id has registered' % username)
@@ -165,7 +165,9 @@ def handle_browser_register_request(request_id: str, username: str, password: st
 
     # 经判断是中南大学学生，生成token，并将相应数据持久化
     redis_client.set("auth:request_status:%s" % request_id, 'identify a student in csu', nx=True, ex=86400)  # 1 day
+    logger.info('student_id:%s identify success' % username)
     insert_browser_account(request_id, username, 'browser')
+
     return True, 'identify a student in csu'
 
 

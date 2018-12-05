@@ -1,6 +1,6 @@
 import os
 
-from everyclass.auth import logger
+
 from everyclass.auth.config.default import Config as DefaultConfig
 
 _config = None
@@ -16,6 +16,7 @@ def get_config():
     :return: Config 类的实例
     """
 
+    from everyclass.auth import logger
     if MixedConfig.inited:
         return MixedConfig
     else:

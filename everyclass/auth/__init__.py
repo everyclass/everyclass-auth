@@ -1,10 +1,21 @@
 import sys
+import threading
 
 from flask import Flask
 import logbook
 from elasticapm.contrib.flask import ElasticAPM
 from raven.contrib.flask import Sentry
 from raven.handlers.logbook import SentryHandler
+
+
+# from everyclass.auth.handle_register_queue import start_register_queue
+
+
+
+import json
+import re
+import time
+
 
 logger = logbook.Logger(__name__)
 
@@ -56,7 +67,6 @@ def create_app(offline=False):
     stderr_handler.format_string = LOG_FORMAT_STRING
     logger.handlers.append(stderr_handler)
 
-
     if not offline and (app.config['CONFIG_NAME'] in ["production", "staging", "testing"]):
         # Sentry
         sentry.init_app(app=app)
@@ -76,4 +86,42 @@ def create_app(offline=False):
     app.register_blueprint(user_blueprint)
 
     logger.info('App created with `{0}` config'.format(app.config['CONFIG_NAME']))
+
+    #开一个新线程来运行队列函数
+
+    threading.Thread(target=start_register_queue).start()
     return app
+
+
+def start_register_queue():
+    """
+    启动用于缓存用户请求的队列
+    如果为空则等待至有元素被加入队列
+    并通过请求不同的验证方式调用不同的处理函数
+    """
+    print('call start register queue')
+
+    from everyclass.auth.handle_register_queue import RedisQueue
+    from everyclass.auth.utils import handle_email_register_request, handle_browser_register_request
+    from everyclass.auth.db.redisdb import redis_client
+
+    user_queue = RedisQueue('everyclass')
+    while True:
+        logger.info('RedisQueue start')
+        # 队列返回的第一个参数为频道名，第二个参数为存入的值
+        result = user_queue.get_wait()[1]
+        if not result:
+            continue
+        user_inf_str = bytes.decode(result)
+        user_inf_str = re.sub('\'', '\"', user_inf_str)
+        user_inf = json.loads(user_inf_str)
+        if user_inf['method'] == 'password':
+            handle_browser_register_request(user_inf['request_id'], user_inf['username'], user_inf['password'])
+        if user_inf['method'] == 'email':
+            inf = handle_email_register_request(user_inf['request_id'], user_inf['username'])
+            print(inf)
+        time.sleep(2)
+
+
+
+

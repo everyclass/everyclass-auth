@@ -1,6 +1,6 @@
-import multiprocessing
+# import multiprocessing
 from everyclass.auth import create_app
-from everyclass.auth.handle_register_queue import start_register_queue
+
 
 app = create_app()
 
