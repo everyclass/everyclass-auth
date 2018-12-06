@@ -1,32 +1,31 @@
 import pymysql
 from DBUtils.PooledDB import PooledDB
 from flask import current_app as app
-# from server import app
-from auth.config import get_config
-
-config = get_config()
 
 
-# def init_pool(current_app):
-#     """创建连接池，保存在 app 的 mysql_pool 对象中"""
-#     # current_app.mysql_pool = PooledDB.ConnectionPool(**current_app.config.MYSQL_CONFIG)
-#     current_app.mysql_pool = PooledDB(creator=pymysql,
-#                                       mincached=1,
-#                                       maxcached=5,
-#                                       maxconnections=100,
-#                                       host=config.MYSQL_CONFIG['host'],
-#                                       user=config.MYSQL_CONFIG['user'],
-#                                       passwd=config.MYSQL_CONFIG['password'],
-#                                       db=config.MYSQL_CONFIG['database'],
-#                                       port=config.MYSQL_CONFIG['port'],
-#                                       charset=config.MYSQL_CONFIG['charset'])
-#     print("456")
+def init_pool(current_app):
+    """创建连接池，保存在 app 的 mysql_pool 对象中"""
+
+    # current_app.mysql_pool = PooledDB.ConnectionPool(**current_app.config.MYSQL_CONFIG)
+    current_app.mysql_pool = PooledDB(creator=pymysql,
+                                      mincached=1,
+                                      maxcached=5,
+                                      maxconnections=100,
+                                      host=current_app.config['MYSQL_CONFIG']['host'],
+                                      user=current_app.config['MYSQL_CONFIG']['user'],
+                                      passwd=current_app.config['MYSQL_CONFIG']['password'],
+                                      db=current_app.config['MYSQL_CONFIG']['db'],
+                                      port=current_app.config['MYSQL_CONFIG']['port'],
+                                      charset=current_app.config['MYSQL_CONFIG']['charset'])
+    print(current_app)
+    print(current_app.mysql_pool)
 
 
 def get_connection():
     """在连接池中获得连接"""
-    # return app.mysql_pool.connection()
-    return pymysql.Connection(**config.MYSQL_CONFIG)
+    return app.mysql_pool.connection()
+
+    # return pymysql.Connection(**config.MYSQL_CONFIG)
 
 
 def check_if_have_registered(username):

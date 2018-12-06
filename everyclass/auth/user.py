@@ -114,6 +114,10 @@ def get_identifying_result():
     return message
 
 
+@user_blueprint.route('/testdb', methods=['POST'])
+def testdb():
+    return testDB()
+
 
 
 

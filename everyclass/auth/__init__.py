@@ -16,6 +16,7 @@ import json
 import re
 import time
 
+from everyclass.auth.db.mysql import init_pool
 
 logger = logbook.Logger(__name__)
 
@@ -84,6 +85,9 @@ def create_app(offline=False):
 
     from everyclass.auth.user import user_blueprint
     app.register_blueprint(user_blueprint)
+
+    # 初始化数据库
+    init_pool(app)
 
     logger.info('App created with `{0}` config'.format(app.config['CONFIG_NAME']))
 
