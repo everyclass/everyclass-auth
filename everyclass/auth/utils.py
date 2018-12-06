@@ -175,7 +175,7 @@ def handle_browser_register_request(request_id: str, username: str, password: st
     """
     print('调用handlerbrowse')
     if check_if_have_registered(username):
-        redis_client.set("auth:request_status:%s" % request_id, 'student has registered', nx=True, ex=86400)
+        redis_client.set("auth:request_status:%s" % request_id, 'student has registered', ex=86400)
         logger.info('student_id:%s identify fail becacuse id has registered' % username)
         return False, 'student has registered'
 
@@ -184,12 +184,12 @@ def handle_browser_register_request(request_id: str, username: str, password: st
     result = simulate_login(username, password)
     # 密码错误
     if not result[0]:
-        redis_client.set("auth:request_status:%s" % request_id, 'password wrong', nx=True, ex=86400)
+        redis_client.set("auth:request_status:%s" % request_id, 'password wrong', ex=86400)
         logger.info('student_id:%s identify fail because password wrong' % username)
         return False, result[1]
 
     # 经判断是中南大学学生，生成token，并将相应数据持久化
-    redis_client.set("auth:request_status:%s" % request_id, 'identify a student in csu', nx=True, ex=86400)  # 1 day
+    redis_client.set("auth:request_status:%s" % request_id, 'identify a student in csu', ex=86400)  # 1 day
     logger.info('student_id:%s identify success' % username)
     insert_browser_account(request_id, username, 'browser')
 
@@ -206,7 +206,7 @@ def handle_email_register_request(request_id: str, username: str):
     email = username + "@csu.edu.cn"
     token = str(uuid.uuid1())
     send_email(email, token)
-    redis_client.set("auth:request_status" + request_id, 'sendEmail success', nx=True, ex=86400)
+    redis_client.set("auth:request_status" + request_id, 'sendEmail success', ex=86400)
     request_info = "%s:%s" % (request_id, username)
     redis_client.set("auth:email_token:%s" % token, request_info, ex=86400)
     return True, 'sendEmail success'
