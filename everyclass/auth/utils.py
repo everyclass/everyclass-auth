@@ -133,11 +133,26 @@ def simulate_login(username: str, password: str):
         if driver.current_url == 'http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp':
             return True, 'identifying success'
 
-        prompt = driver.find_element_by_css_selector("font[color='red']")
-        # 出现密码错误的提示
-        if '该帐号不存在或密码错误,请联系管理员!' == prompt.text:
-            return False, 'password wrong'
+        # 出现红色提示窗口
+        prompt = driver.find_elements_by_css_selector("font[color='red']")
+        if len(prompt) > 0:
+            # 出现密码错误的提示
+            if prompt[0].text == '该帐号不存在或密码错误,请联系管理员!':
+                return False, 'password wrong'
+
+            # 还有可能弹出验证码无效等等错误提示
+            logger.warning('arise other prompt,prompt is : ' + prompt[0])
+
+        # 出现alert text弹窗
+        try:
+            alert = driver.switch_to.alert
+            alert.accept()
+            logger.warning('arise alert,alert text is' + alert.text)
+        except:
+            pass
+
         identifying_time = identifying_time + 1
+
     # 验证码识别多次后仍然失败
     logger.warning('identifying code mistakes too much times')
     return False, 'identifying code mistakes too much times'
