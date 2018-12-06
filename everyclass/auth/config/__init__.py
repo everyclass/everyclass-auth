@@ -1,6 +1,5 @@
 import os
 
-
 from everyclass.auth.config.default import Config as DefaultConfig
 
 _config = None

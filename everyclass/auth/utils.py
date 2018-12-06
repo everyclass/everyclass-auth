@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
 import functools
 import uuid
 import time
@@ -124,7 +122,7 @@ def simulate_login(username: str, password: str):
         identifying_pic.save("everyclass/auth/pic/code_screenshot.png")
         # 获取验证码图片，读取验证码
         identifying_code = pytesseract.image_to_string(identifying_pic)
-        print(identifying_code)
+        logger.debug("验证码为：" + identifying_code)
         identifying_input.send_keys(identifying_code)
         login_button.click()  # 点击登录
 
@@ -173,7 +171,6 @@ def handle_browser_register_request(request_id: str, username: str, password: st
     处理redis队列中的通过浏览器验证的请求
 
     """
-    print('调用handlerbrowse')
     if check_if_have_registered(username):
         redis_client.set("auth:request_status:%s" % request_id, 'student has registered', ex=86400)
         logger.info('student_id:%s identify fail becacuse id has registered' % username)

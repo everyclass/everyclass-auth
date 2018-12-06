@@ -17,8 +17,6 @@ def init_pool(current_app):
                                       db=current_app.config['MYSQL_CONFIG']['db'],
                                       port=current_app.config['MYSQL_CONFIG']['port'],
                                       charset=current_app.config['MYSQL_CONFIG']['charset'])
-    print(current_app)
-    print(current_app.mysql_pool)
 
 
 def get_connection():
@@ -131,10 +129,4 @@ def select_username_by_token(token):
     if connection:
         connection.close()
     return result
-
-
-if __name__ == '__main__':
-    print(select_username_by_token('123'))
-
-
 

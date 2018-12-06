@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+
 from everyclass.auth.db.mysql import *
 from everyclass.auth.utils import json_payload
 from auth.handle_register_queue import redis_client, RedisQueue
