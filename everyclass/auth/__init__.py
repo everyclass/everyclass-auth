@@ -22,6 +22,8 @@ logger = logbook.Logger(__name__)
 
 sentry = Sentry()
 
+__app = None
+
 
 def create_app(offline=False):
     print('call create_app')
@@ -91,9 +93,12 @@ def create_app(offline=False):
 
     logger.info('App created with `{0}` config'.format(app.config['CONFIG_NAME']))
 
-    #开一个新线程来运行队列函数
+    global __app
+    __app = app
 
+    # 开一个新线程来运行队列函数
     threading.Thread(target=start_register_queue).start()
+
     return app
 
 
@@ -103,7 +108,10 @@ def start_register_queue():
     如果为空则等待至有元素被加入队列
     并通过请求不同的验证方式调用不同的处理函数
     """
-    print('call start register queue')
+    logger.debug('call start register queue')
+    global __app
+    ctx = __app.app_context()
+    ctx.push()
 
     from everyclass.auth.handle_register_queue import RedisQueue
     from everyclass.auth.utils import handle_email_register_request, handle_browser_register_request
@@ -125,7 +133,3 @@ def start_register_queue():
             inf = handle_email_register_request(user_inf['request_id'], user_inf['username'])
             print(inf)
         time.sleep(2)
-
-
-
-
