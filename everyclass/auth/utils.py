@@ -135,14 +135,23 @@ def simulate_login(username: str, password: str):
 
         # 出现红色提示窗口
         prompt = driver.find_elements_by_css_selector("font[color='red']")
-        print(prompt)
         if len(prompt) > 0:
             # 出现密码错误的提示
             if prompt[0].text == '该帐号不存在或密码错误,请联系管理员!':
                 return False, 'password wrong'
 
+            # 离奇抽风时会刷新网页，需要重新输入用户名和密码
+            if prompt[0] == '用户名或密码为空!':
+                name_input = driver.find_element_by_id("userAccount")  # 找到用户名的框框
+                pass_input = driver.find_element_by_id('userPassword')  # 找到输入密码的框框
+                name_input.clear()
+                name_input.send_keys(username)  # 填写用户名
+                time.sleep(0.2)
+                pass_input.clear()
+                pass_input.send_keys(password)  # 填写密码
+
             # 还有可能弹出验证码无效等等错误提示
-            logger.warning('arise other prompt,prompt is : ' + str(prompt[0]))
+            logger.warning('arise other prompt,prompt is : ' + str(prompt[0].text))
 
         # 出现alert text弹窗
         try:
