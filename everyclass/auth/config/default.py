@@ -8,18 +8,8 @@ class Config(object):
     """
     DEBUG = False
     SECRET_KEY = 'development_key'
-    # MYSQL_CONFIG = {
-    #     'user'       : 'database_user',
-    #     'password'   : 'database_password',
-    #     'host'       : '127.0.0.1',
-    #     'port'       : '6666',
-    #     'database'   : 'everyclass',
-    #     'use_unicode': True,
-    #     'charset'    : 'utf8mb4'
-    # }
+
     MYSQL_CONFIG = {
-        # 'user'       : 'root',
-        # 'password': ',G(mvC4ocooZt)KjGt',
         'user': 'root',
         'password': 'root',
         'host': 'localhost',
@@ -71,7 +61,7 @@ class Config(object):
     EMAIL = {
         'mail_host': 'smtp.mailgun.org',
         'mail_user': 'verification@mail.everyclass.xyz',
-        'mail_pass': 'i6JdAYjwHrDmVErUAtEJ',
+        'mail_pass': '12234',
         'sender':    'verification@mail.everyclass.xyz',
         'SMTP_port': 2525
 
