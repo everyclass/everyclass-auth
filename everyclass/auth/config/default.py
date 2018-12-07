@@ -10,13 +10,13 @@ class Config(object):
     SECRET_KEY = 'development_key'
 
     MYSQL_CONFIG = {
-        'user': 'root',
-        'password': 'root',
-        'host': 'localhost',
-        'port': 3306,
-        'db': 'everyclass_login',
-        'use_unicode': True,
-        'charset': 'utf8mb4'
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': 'localhost',
+        'PORT': 3306,
+        'DB': 'everyclass_login',
+        'USE_UNICODE': True,
+        'CHARSET': 'utf8mb4'
     }
 
     """
@@ -38,9 +38,9 @@ class Config(object):
     APM and error tracking platforms
     """
     SENTRY_CONFIG = {
-        'dsn'    : '',
-        'release': '',
-        'tags'   : {'environment': 'default'}
+        'DSN'    : '',
+        'RELSEASE': '',
+        'TAGS'   : {'environment': 'default'}
     }
     ELASTIC_APM = {
         'SERVICE_NAME'   : 'everyclass-auth_server',
@@ -59,11 +59,11 @@ class Config(object):
     邮件SMTP服务相关设置
     """
     EMAIL = {
-        'mail_host': 'smtp',
-        'mail_user': 'mail_user',
-        'mail_pass': '12234',
-        'sender':    'mail_sender',
-        'SMTP_port': 2525
+        'MAIL_HOST': 'smtp',
+        'MAIL_USER': 'mail_user',
+        'MAIL_PASS': '12234',
+        'SENDER':    'mail_sender',
+        'PORT': 2525
 
     }
 
