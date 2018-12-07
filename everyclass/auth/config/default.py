@@ -43,7 +43,7 @@ class Config(object):
         'tags'   : {'environment': 'default'}
     }
     ELASTIC_APM = {
-        'SERVICE_NAME'   : 'everyclass-api_server',
+        'SERVICE_NAME'   : 'everyclass-auth_server',
         'SECRET_TOKEN'   : 'token',
         'SERVER_URL'     : 'http://127.0.0.1:8200',
         # https://www.elastic.co/guide/en/apm/agent/python/2.x/configuration.html#config-auto-log-stacks
@@ -59,10 +59,10 @@ class Config(object):
     邮件SMTP服务相关设置
     """
     EMAIL = {
-        'mail_host': 'smtp.mailgun.org',
-        'mail_user': 'verification@mail.everyclass.xyz',
+        'mail_host': 'smtp',
+        'mail_user': 'mail_user',
         'mail_pass': '12234',
-        'sender':    'verification@mail.everyclass.xyz',
+        'sender':    'mail_sender',
         'SMTP_port': 2525
 
     }
