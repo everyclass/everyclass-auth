@@ -1,6 +1,8 @@
 import functools
 import uuid
 import time
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import parseaddr, formataddr
@@ -61,10 +63,30 @@ def send_email(email, token):
 
     sender = config.EMAIL['sender']
     receivers = email
-    message = MIMEText(token, 'html', 'utf-8')
+    # message = MIMEText(token, 'html', 'utf-8')
+    message = MIMEMultipart('related')
     message['From'] = _format_address("每课 <verification@mail.everyclass.xyz>")
     message['To'] = _format_address("每课用户 <%s>" % email)
     message['Subject'] = Header('每课@CSU 学生身份验证', charset='utf-8').encode()
+
+    message_alternative = MIMEMultipart('alternative')
+    message.attach(message_alternative)
+
+    file = open('everyclass/auth/everyclass_email.html', 'r', encoding='utf-8')
+    original_text = file.read()
+    text = original_text.format(token)
+    file.close()
+
+    message_alternative.attach(MIMEText(text, 'html', 'utf-8'))
+
+    # 指定图片为当前目录
+    file2 = open('everyclass/auth/everyclass_icon.png', 'rb')
+    message_image = MIMEImage(file2.read())
+    file2.close()
+
+    # 定义图片 ID，在 HTML 文本中引用
+    message_image.add_header('Content-ID', '<image1>')
+    message.attach(message_image)
 
     smtpObj = smtplib.SMTP()
     smtpObj.connect(mail_host, config.EMAIL['SMTP_port'])  # SMTP 端口号
@@ -197,10 +219,11 @@ def handle_email_register_request(request_id: str, username: str):
     :param request_id: str, 请求 ID
     :param username: str, 学号
     """
+    logger.debug("use handle_email_register_request")
     email = username + "@csu.edu.cn"
     token = str(uuid.uuid1())
     send_email(email, token)
-    redis_client.set("auth:request_status" + request_id, 'sendEmail success', ex=86400)
+    redis_client.set("auth:request_status:%s" % request_id, 'sendEmail success', ex=86400)
     request_info = "%s:%s" % (request_id, username)
     redis_client.set("auth:email_token:%s" % token, request_info, ex=86400)
     return True, 'sendEmail success'

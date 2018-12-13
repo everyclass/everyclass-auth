@@ -49,12 +49,15 @@ def insert_email_account(request_id, username, method, token):
     cursor = connection.cursor()
     sql = "INSERT INTO account(request_id, username, method, token) " \
           "VALUES( \'%s\', \'%s\', \'%s\', \'%s\')" \
-          % (int(request_id), username, method, token)
+          % (request_id, username, method, token)
     cursor.execute(sql)
+    connection.commit()
+    count = cursor.rowcount
     if cursor:
         cursor.close()
     if connection:
         connection.close()
+    return count
 
 
 def insert_browser_account(request_id, username, method):

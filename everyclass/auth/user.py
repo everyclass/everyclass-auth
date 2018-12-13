@@ -57,7 +57,7 @@ def register_by_email():
     user_information = {"request_id": request_id, "username": username, "method": "email"}
     user_queue.put(user_information)
 
-    logger.info('stuent_id:%s request registering by email' % username)
+    logger.info('student_id:%s request registering by email' % username)
 
     return jsonify({
         "success": True,
@@ -66,7 +66,7 @@ def register_by_email():
 
 
 @user_blueprint.route('/identifying_email_code', methods=['POST'])
-@json_payload('token', supposed_type=str)
+@json_payload('email_code', supposed_type=str)
 def identifying_email_code():
     """
         从用户输入的code判断，该用户是否有注册资格
@@ -75,25 +75,27 @@ def identifying_email_code():
             "email_code": "asdda451"
         }
     """
-    token = request.json.get('token')
-    if not token:
+    email_code = request.json.get('email_code')
+
+    if not email_code:
         return jsonify({
             'success': False,
-            'message': 'no token in request'
+            'message': 'no email_code in request'
         })
-    user_inf_by_token = redis_client.get(token)
+    user_inf_by_token = redis_client.get("auth:email_token:%s" % email_code)
     if not user_inf_by_token:
-        logger.info('no user for token %s' % token)
+        logger.info('no user for email_code %s' % email_code)
         return jsonify({
             'success': False,
-            'message': 'no user for token'
+            'message': 'no user for email_code'
         })
-    # 通过的token取到的数据格式为auth:email_token:request_id:username
-    user_inf = bytes.decode(redis_client.get(token)).split(':')
-    request_id = user_inf[2]
-    username = user_inf[3]
-    insert_email_account(request_id, username, 'email', token)
-    logger.info('student_id:%s request success' % username)
+    # 通过的user_inf_by_token取到的数据格式为request_id:username
+    logger.debug(user_inf_by_token)
+    user_inf = bytes.decode(user_inf_by_token).split(':')
+    request_id = user_inf[0]
+    username = user_inf[1]
+    insert_email_account(request_id, username, 'email', email_code)
+    logger.info('student_id:%s identifying success' % username)
     return jsonify({
         'success': True
     })
