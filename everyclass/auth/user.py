@@ -28,7 +28,7 @@ def register_by_password():
     user_information = {"request_id": request_id, "username": username, "password": password, "method": "password"}
     user_queue.put(user_information)
 
-    logger.info('stuent_id:%s request registering by password' % username)
+    logger.info('student_id:%s request registering by password' % username)
 
     return jsonify({
         "success": True,

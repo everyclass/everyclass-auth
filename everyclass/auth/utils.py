@@ -11,10 +11,11 @@ from flask import abort, request
 import smtplib
 from pytesseract import pytesseract
 from selenium import webdriver
+from selenium.common.exceptions import UnexpectedAlertPresentException
 from PIL import Image
 
 from everyclass.auth.db.mysql import *
-from everyclass.auth.handle_register_queue import redis_client
+# from everyclass.auth.handle_register_queue import redis_client
 from everyclass.auth import logger
 from everyclass.auth.config import get_config
 
@@ -99,6 +100,69 @@ def send_email(email, token):
     smtpObj.quit()
 
 
+def simulate_login_noidentifying(username: str, password: str):
+    """
+    浏览器模拟登陆,且不需要使用验证码读取，优先使用，更加快捷
+    :param username: str
+    :param password: str
+    :return:
+    """
+    if username.strip() == '':
+        return False, 'username is null'
+
+    if password.strip() == '':
+        return False, 'password is null'
+
+    # 创建chrome参数对象
+    options = webdriver.ChromeOptions()
+    # 把chrome设置成无界面模式
+    options.add_argument('headless')
+    # 创建chrome无界面对象
+    driver = webdriver.Chrome(chrome_options=options)
+    url = "http://csujwc.its.csu.edu.cn/jsxsd/view/xskb/queryglkb.jsp#"
+    driver.get(url)
+
+    identifying_time = 0
+    while identifying_time < 10:
+        identifying_time = identifying_time + 1
+
+        name_input = driver.find_element_by_id("userAccount")  # 找到用户名的框框
+        pass_input = driver.find_element_by_id('userPassword')  # 找到输入密码的框框
+        name_input.clear()
+        name_input.send_keys(username)  # 填写用户名
+        time.sleep(0.2)
+        pass_input.clear()
+        pass_input.send_keys(password)  # 填写密码
+        time.sleep(0.3)
+
+        login_button = driver.find_element_by_id('btnSubmit')  # 找到登录按钮
+        login_button.click()  # 点击登录
+
+        # alert = driver.switch_to.alert
+        # print(alert)
+        # # alert.accept()
+        #
+        # print(alert.text)
+        try:
+            driver.refresh()
+            if driver.current_url == 'http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp':
+                return True, 'identifying success'
+
+            # 出现红色提示窗口
+            prompt = driver.find_elements_by_css_selector("font[color='red']")
+            if len(prompt) > 0:
+                # 出现密码错误的提示
+                if prompt[0].text == '用户名或密码错误':
+                    return False, 'password wrong'
+
+        # 出现alert，一般是用户名或者密码为空或者是其他特殊情况
+        except UnexpectedAlertPresentException:
+            logger.debug('arise alert')
+            alert = driver.switch_to.alert
+            # alert.accept()
+            return False, 'arise alert' + alert.text
+
+
 def simulate_login(username: str, password: str):
     """
     浏览器模拟登陆
@@ -145,13 +209,22 @@ def simulate_login(username: str, password: str):
         identifying_input.send_keys(identifying_code)
         login_button.click()  # 点击登录
 
-        # 若验证码判断正确，即不出现验证码错误的提示，就会找不到提示元素，返回true
-        driver.refresh()
+        # 若验证码判断正确，即不出现验证码错误的提示，就会找不到提示元素，并且跳转到教务系统的主页面，返回true
+        try:
+            driver.refresh()
+
+        # 出现alert text弹窗
+        except UnexpectedAlertPresentException:
+            alert = driver.switch_to.alert
+            alert.accept()
+            logger.warning('arise alert,alert text is' + alert.text)
+            return False, 'arise alert:' + alert.text
+
         if driver.current_url == 'http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp':
             return True, 'identifying success'
 
-        # 出现红色提示窗口
-        prompt = driver.find_elements_by_css_selector("font[color='red']")
+        # 出现红色提示
+        prompt = driver.find_elementsre_by_css_selector("font[color='red']")
         if len(prompt) > 0:
             # 出现密码错误的提示
             if prompt[0].text == '该帐号不存在或密码错误,请联系管理员!':
@@ -170,13 +243,7 @@ def simulate_login(username: str, password: str):
             # 还有可能弹出验证码无效等等错误提示
             logger.warning('arise other prompt,prompt is : ' + str(prompt[0].text))
 
-        # 出现alert text弹窗
-        try:
-            alert = driver.switch_to.alert
-            alert.accept()
-            logger.warning('arise alert,alert text is' + alert.text)
-        except:
-            pass
+
 
         identifying_time = identifying_time + 1
 
@@ -190,6 +257,8 @@ def handle_browser_register_request(request_id: str, username: str, password: st
     处理redis队列中的通过浏览器验证的请求
 
     """
+    from everyclass.auth.handle_register_queue import redis_client
+
     if check_if_have_registered(username):
         redis_client.set("auth:request_status:%s" % request_id, 'student has registered', ex=86400)
         logger.info('student_id:%s identify fail becacuse id has registered' % username)
@@ -197,7 +266,8 @@ def handle_browser_register_request(request_id: str, username: str, password: st
 
     # 判断该用户是否为中南大学学生
     # result数组第一个参数为bool类型判断验证是否成功，第二个参数为出错原因
-    result = simulate_login(username, password)
+    result = simulate_login_noidentifying(username, password)
+    logger.debug(result)
     # 密码错误
     if not result[0]:
         redis_client.set("auth:request_status:%s" % request_id, 'password wrong', ex=86400)
@@ -219,6 +289,8 @@ def handle_email_register_request(request_id: str, username: str):
     :param request_id: str, 请求 ID
     :param username: str, 学号
     """
+    from everyclass.auth.handle_register_queue import redis_client
+
     logger.debug("use handle_email_register_request")
     email = username + "@csu.edu.cn"
     token = str(uuid.uuid1())
@@ -236,6 +308,5 @@ def _format_address(email):
 
 
 if __name__ == '__main__':
-    send_email('919081500@qq.com', "123")
-    send_email("3901160413@csu.edu.cn", '123')
-
+    result = simulate_login_noidentifying('', 430111199709070774)
+    print(result)

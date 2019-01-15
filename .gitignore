@@ -1,3 +1,4 @@
 everyclass/auth/config/development.py
 .idea
 everyclass/auth/pic
+everyclass/auth/test
