@@ -106,7 +106,6 @@ def start_register_queue():
     ctx.push()
 
     from everyclass.auth.handle_register_queue import RedisQueue
-    from everyclass.auth.utils import handle_email_register_request, handle_browser_register_request
     from everyclass.auth.db.redisdb import redis_client
 
     user_queue = RedisQueue('everyclass')
@@ -120,7 +119,7 @@ def start_register_queue():
         user_inf_str = re.sub('\'', '\"', user_inf_str)
         user_inf = json.loads(user_inf_str)
         if user_inf['method'] == 'password':
-            handle_browser_register_request(user_inf['request_id'], user_inf['username'], user_inf['password'])
+            user_queue.handle_browser_register_request(user_inf['request_id'], user_inf['username'], user_inf['password'])
         if user_inf['method'] == 'email':
-            inf = handle_email_register_request(user_inf['request_id'], user_inf['username'])
+            user_queue.handle_email_register_request(user_inf['request_id'], user_inf['username'])
         time.sleep(2)

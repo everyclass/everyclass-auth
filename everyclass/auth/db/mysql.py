@@ -76,6 +76,21 @@ def insert_browser_account(request_id, username, method):
     return count
 
 
+def check_if_request_id_exist(request_id):
+    """检查指定token是否存在"""
+    connection = get_connection()
+    cursor = connection.cursor()
+    sql = "SELECT request_id FROM account WHERE request_id=%s"
+    result = cursor.execute(sql, (request_id,))
+    if cursor:
+        cursor.close()
+    if connection:
+        connection.close()
+    if result:
+        return True
+    else:
+        return False
+
 def check_if_token_exist(token):
     """检查指定token是否存在"""
     connection = get_connection()
