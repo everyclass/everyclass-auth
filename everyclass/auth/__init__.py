@@ -1,12 +1,13 @@
-import sys
-import threading
+import gc
 import json
 import re
+import sys
+import threading
 import time
 
-from flask import Flask
 import logbook
 from elasticapm.contrib.flask import ElasticAPM
+from flask import Flask
 from raven.contrib.flask import Sentry
 from raven.handlers.logbook import SentryHandler
 
@@ -16,11 +17,67 @@ logger = logbook.Logger(__name__)
 sentry = Sentry()
 __app = None
 
+try:
+    import uwsgidecorators
+
+    """
+    below are functions that will be executed in **each** process after fork().
+    these functions will be executed in the same order of definition here.
+    """
+
+
+    @uwsgidecorators.postfork
+    def enable_gc():
+        """enable garbage collection"""
+        gc.set_threshold(700)
+
+
+    @uwsgidecorators.postfork
+    def init_db():
+        """init database connection"""
+        global __app
+        init_pool(__app)
+
+
+    @uwsgidecorators.postfork
+    def init_log_handlers():
+        """init log handlers"""
+        from everyclass.auth.util.logbook_logstash.handler import LogstashHandler
+        from elasticapm.contrib.flask import ElasticAPM
+
+        global __app, __sentry_available
+
+        # Sentry
+        if __app.config['CONFIG_NAME'] in __app.config['SENTRY_AVAILABLE_IN']:
+            sentry.init_app(app=__app)
+            sentry_handler = SentryHandler(sentry.client, level='WARNING')  # Sentry 只处理 WARNING 以上的
+            logger.handlers.append(sentry_handler)
+            __sentry_available = True
+            logger.info('You are in {} mode, so Sentry is inited.'.format(__app.config['CONFIG_NAME']))
+
+        # Elastic APM
+        if __app.config['CONFIG_NAME'] in __app.config['APM_AVAILABLE_IN']:
+            ElasticAPM(__app)
+            logger.info('You are in {} mode, so APM is inited.'.format(__app.config['CONFIG_NAME']))
+
+        # Logstash centralized log
+        if __app.config['CONFIG_NAME'] in __app.config['LOGSTASH_AVAILABLE_IN']:
+            logstash_handler = LogstashHandler(host=__app.config['LOGSTASH']['HOST'],
+                                               port=__app.config['LOGSTASH']['PORT'],
+                                               release=__app.config['GIT_DESCRIBE'],
+                                               bubble=True,
+                                               logger=logger,
+                                               filter=lambda r, h: r.level >= 11)  # do not send DEBUG
+            logger.handlers.append(logstash_handler)
+            logger.info('You are in {} mode, so LogstashHandler is inited.'.format(__app.config['CONFIG_NAME']))
+except ModuleNotFoundError:
+    pass
+
 
 def create_app(offline=False):
     logger.debug('call create_app')
-    from everyclass.utils.logbook_logstash.handler import LogstashHandler
-    from everyclass.utils.logbook_logstash.formatter import LOG_FORMAT_STRING
+    from everyclass.auth.util.logbook_logstash.handler import LogstashHandler
+    from everyclass.auth.util.logbook_logstash.formatter import LOG_FORMAT_STRING
 
     app = Flask(__name__)
 
@@ -81,7 +138,8 @@ def create_app(offline=False):
     app.register_blueprint(user_blueprint)
 
     # 初始化数据库
-    init_pool(app)
+    if app.config['CONFIG_NAME'] == 'development':
+        init_pool(app)
 
     logger.info('App created with `{0}` config'.format(app.config['CONFIG_NAME']))
 

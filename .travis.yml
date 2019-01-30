@@ -1,0 +1,29 @@
+language: python
+dist: trusty
+sudo: required
+services:
+- docker
+python:
+- '3.6'
+env:
+  global:
+  - FLASK_ENV=development
+  - secure: ZCEZlbNsERyKWBudUbAjOIOjr7JxI86GKheaAt/f8TrvbukFqoa4n4ngD+XA7jCM3okAM2uVBjeBAmFqMYbfgotvwaJoy8HDS80jaPif0yjG2ZhxqP+UVRWPcs04fM5c+y4nnwrhGc/t0NExtCs7jwK+zJg7ulV7yNfIKc1lz1BEbVmq5lamxTHuMfI7rY+yr+0lcQY1eikvgj6XDRULRtFj0t9yqHYqIm6L74gUFfarokpQHm6Tv6y7iYY6t3kIJsNKZ5HQZIh+BORUj/9Sd6ZrfxKm26J5AxRY6jNeOoVZmn8sVyqKl0eRg9MzAR5FSYkpXY6ZZK08ci/SQZ1pdOOEL3n0HZ+HbIi0xbjtfQHHUaUwGIffgCZhxFs0Xkjc4R4XpfG0YXRt9BdIMjuGeYuK30Qy7QPJsr9oKwKQIym95fkGVWq9Kj+RlhzkTgz0SQHxtAdmOyYUNIdexd0S0KSTiaKbfwHuv+hzfCEk5qMVCeGWA52hiefGs712I2n4D1Dz8h0DP4peqJxxmYXqmdUAQpnklq+j/eXhzkyP9/xsnu+kVjgy8LfrHeH5/LmqreagxunmJErwR2bJTWDWpvv7g+J5LD4CKk/imzHr+rlldoyJVjgC+NHdBFdldyO0u+EX6HT2/PMutFgFJBl7ZjSG9lFaXkDNt4dW1tzlEOc=
+install:
+- pip install pipenv
+- pipenv install --dev
+before_script:
+- export MODE=CI
+script:
+- flake8
+deploy:
+- provider: script
+  script: bash deploy/travis.sh
+  on:
+    tags: true
+notifications:
+  slack:
+    on_success: always
+    on_failure: always
+    rooms:
+      secure: thpIFYFPANrA5u91ZuajyICwzHE320rjBDc61dBIB38f4V0cQAkQP411Wiw+c8urBuwe3kVtKgdcps/qOgeVkDRGC1kZOJHSFal+avZCvMYBSDIOTN5VEV9+utUJMWlmAXeKi/foJLsyknBa7QodtNtdMWtv8BY05xqJcTBrvghZIDb3EQUnNug31LxtIQ4ejg8Gfi6pAX2OktS4n+dM07VwtcncCG01KIxbqYUgD+0ZqaQRE9FfsIEnnmMOnkwA08eMO/IQSsT9stHNSP+tcglZtjriN10IIfrbZ572ucZrtCOpn38PlJnqUgdsvKAgTtfk+1Nt4Tnx/Po88jq4ujdLXGyCapwmACeojn2qTyV95ZyCVf4Qd43A1oupw1FAX5oZF1NCxt59F7R3SjMJ8AbcpaX4Ofb28UNDNo0jZTmL90iayt4/tF7AtjgwXzR3VHZ1cdsD79j9ABVbxmQ7fWN+Or087wCibiwPpTAPNvePRCOa/YwrjrjuYYZOlf8gpzWncdmiKGo4EdYITOY+8CAZtn7ASX8r8CvTJitrJHo2fK/1HveCrDsIZYo875CBIQGU+tszcQ2AL5XUrzrMi3lok4WSWtHsg5ZNtjj0RgToD/Rg+URd1j0YF3RYKFEwCNPqE4mry/eFgrQis+kUK+5aHCix7seFGtG6FsbXQI0=

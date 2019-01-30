@@ -1,5 +1,6 @@
-import git
 import os
+
+import git
 
 
 class Config(object):
@@ -10,13 +11,13 @@ class Config(object):
     SECRET_KEY = 'development_key'
 
     MYSQL_CONFIG = {
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',
-        'PORT': 3306,
-        'DB': 'everyclass_login',
+        'USER'       : 'root',
+        'PASSWORD'   : 'root',
+        'HOST'       : 'localhost',
+        'PORT'       : 3306,
+        'DB'         : 'everyclass_login',
         'USE_UNICODE': True,
-        'CHARSET': 'utf8mb4'
+        'CHARSET'    : 'utf8mb4'
     }
 
     """
@@ -38,9 +39,9 @@ class Config(object):
     APM and error tracking platforms
     """
     SENTRY_CONFIG = {
-        'DSN'    : '',
+        'DSN'     : '',
         'RELSEASE': '',
-        'TAGS'   : {'environment': 'default'}
+        'TAGS'    : {'environment': 'default'}
     }
     ELASTIC_APM = {
         'SERVICE_NAME'   : 'everyclass-auth_server',
@@ -55,6 +56,11 @@ class Config(object):
         'PORT': 8888
     }
 
+    # define available environments for logs, APM and error tracking
+    SENTRY_AVAILABLE_IN = ['production', 'staging', 'testing']
+    APM_AVAILABLE_IN = ['production', 'staging', 'testing']
+    LOGSTASH_AVAILABLE_IN = ['production', 'staging', 'testing']
+
     """
     邮件SMTP服务相关设置
     """
@@ -62,8 +68,8 @@ class Config(object):
         'MAIL_HOST': 'smtp',
         'MAIL_USER': 'mail_user',
         'MAIL_PASS': '12234',
-        'SENDER':    'mail_sender',
-        'PORT': 2525
+        'SENDER'   : 'mail_sender',
+        'PORT'     : 2525
 
     }
 
