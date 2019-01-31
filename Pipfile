@@ -16,11 +16,14 @@ urllib3 = "==1.23"
 pytesseract = "*"
 redis = "*"
 selenium = "*"
+blinker = "*"
+uwsgidecorators = "*"
 
 [dev-packages]
 coverage = "==4.4.2"
 codecov = "*"
 nose = "==1.3.7"
+"flake8" = "*"
 
 [requires]
 python_version = "3.7"
