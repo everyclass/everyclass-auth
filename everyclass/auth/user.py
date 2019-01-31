@@ -1,9 +1,10 @@
 from flask import Blueprint, jsonify, request
 
+from auth.handle_register_queue import RedisQueue, redis_client
+from everyclass.auth import logger
 from everyclass.auth.db.mysql import *
 from everyclass.auth.utils import json_payload
-from auth.handle_register_queue import redis_client, RedisQueue
-from everyclass.auth import logger
+
 user_blueprint = Blueprint('user', __name__, url_prefix='/user')
 
 
@@ -120,7 +121,3 @@ def get_identifying_result():
 @user_blueprint.route('/testdb', methods=['POST'])
 def testdb():
     return testDB()
-
-
-
-

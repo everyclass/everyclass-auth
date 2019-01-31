@@ -91,6 +91,7 @@ def check_if_request_id_exist(request_id):
     else:
         return False
 
+
 def check_if_token_exist(token):
     """检查指定token是否存在"""
     connection = get_connection()
@@ -147,4 +148,3 @@ def select_username_by_token(token):
     if connection:
         connection.close()
     return result
-

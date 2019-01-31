@@ -1,9 +1,9 @@
 import time
 
+from PIL import Image
 from pytesseract import pytesseract
 from selenium import webdriver
 from selenium.common.exceptions import UnexpectedAlertPresentException
-from PIL import Image
 
 from everyclass.auth import logger
 
@@ -154,8 +154,6 @@ def simulate_login(username: str, password: str):
 
             # 还有可能弹出验证码无效等等错误提示
             logger.warning('arise other prompt,prompt is : ' + str(prompt[0].text))
-
-
 
         identifying_time = identifying_time + 1
 

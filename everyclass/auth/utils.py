@@ -34,15 +34,3 @@ def json_payload(*fields, supposed_type=None, supposed_in=None):
         return _wrapped
 
     return decorator
-
-
-
-
-
-
-
-
-
-
-
-
