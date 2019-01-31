@@ -1,6 +1,6 @@
 import uuid
 
-from everyclass.auth.db.mysql import *
+from everyclass.auth.db.mysql import check_if_request_id_exist, check_if_have_registered, insert_browser_account
 from everyclass.auth import logger
 from everyclass.auth.db.redisdb import redis_client
 from everyclass.auth.browse_identify import simulate_login_noidentifying
@@ -91,7 +91,3 @@ class RedisQueue(object):
         request_info = "%s:%s" % (request_id, username)
         redis_client.set("auth:email_token:%s" % token, request_info, ex=86400)
         return True, 'sendEmail success'
-
-
-
-

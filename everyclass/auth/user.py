@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from auth.handle_register_queue import RedisQueue, redis_client
 from everyclass.auth import logger
-from everyclass.auth.db.mysql import *
+from everyclass.auth.db.mysql import insert_email_account
 from everyclass.auth.utils import json_payload
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/user')
@@ -116,8 +116,3 @@ def get_identifying_result():
     # 通过redis取出的信息格式为auth:request_state:message
     message = (redis_client.get(request_id)).split(':')[2]
     return message
-
-
-@user_blueprint.route('/testdb', methods=['POST'])
-def testdb():
-    return testDB()
