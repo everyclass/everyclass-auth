@@ -1,5 +1,3 @@
-import os
-
 import git
 
 
@@ -70,10 +68,10 @@ class Config(object):
     邮件SMTP服务相关设置
     """
     EMAIL = {
-        'MAIL_HOST': 'smtp',
-        'MAIL_USER': 'mail_user',
-        'MAIL_PASS': '12234',
-        'SENDER'   : 'mail_sender',
-        'PORT'     : 2525
+        'HOST'    : 'smtp',
+        'USERNAME': 'mail_user',
+        'PASSWORD': '12234',
+        'SENDER'  : 'mail_sender',
+        'PORT'    : 2525
 
     }

@@ -18,9 +18,9 @@ def send_email(email, token):
     :param token: str，需要给该邮箱账号发送的token
     """
     # 第三方 SMTP 服务
-    mail_host = config.EMAIL['mail_host']  # 设置服务器
-    mail_user = config.EMAIL['mail_user']  # 用户名
-    mail_pass = config.EMAIL['mail_pass']  # 口令
+    mail_host = config.EMAIL['HOST']  # 设置服务器
+    mail_user = config.EMAIL['USERNAME']  # 用户名
+    mail_pass = config.EMAIL['PASSWORD']  # 口令
 
     sender = config.EMAIL['sender']
     receivers = email
