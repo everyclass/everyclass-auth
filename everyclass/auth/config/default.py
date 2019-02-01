@@ -20,6 +20,11 @@ class Config(object):
         'CHARSET'    : 'utf8mb4'
     }
 
+    REDIS_CONFIG = {
+        'host': '127.0.0.1',
+        'port': 6379
+    }
+
     """
     Git Hash
     """
@@ -72,12 +77,3 @@ class Config(object):
         'PORT'     : 2525
 
     }
-
-    """
-    维护模式
-    """
-    MAINTENANCE_FILE = os.path.join(os.getcwd(), 'maintenance')
-    if os.path.exists(MAINTENANCE_FILE):
-        MAINTENANCE = True
-    else:
-        MAINTENANCE = False
