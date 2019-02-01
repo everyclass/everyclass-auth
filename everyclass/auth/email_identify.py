@@ -7,6 +7,7 @@ from email.utils import parseaddr, formataddr
 import smtplib
 
 from everyclass.auth.config import get_config
+from everyclass.auth import logger
 
 config = get_config()
 
@@ -17,6 +18,9 @@ def send_email(email, token):
     :param email: str,需要发送的邮箱账号
     :param token: str，需要给该邮箱账号发送的token
     """
+
+    logger.info("Sending email to {}".format(email))
+
     # 第三方 SMTP 服务
     mail_host = config.EMAIL['HOST']  # 设置服务器
     mail_user = config.EMAIL['USERNAME']  # 用户名
@@ -33,7 +37,7 @@ def send_email(email, token):
     message_alternative = MIMEMultipart('alternative')
     message.attach(message_alternative)
 
-    file = open('everyclass/static/everyclass_email.html', 'r', encoding='utf-8')
+    file = open('everyclass/auth/static/everyclass_email.html', 'r', encoding='utf-8')
     original_text = file.read()
     text = original_text.format(token)
     file.close()
@@ -41,7 +45,7 @@ def send_email(email, token):
     message_alternative.attach(MIMEText(text, 'html', 'utf-8'))
 
     # 指定图片为当前目录
-    file2 = open('everyclass/static/everyclass_icon.png', 'rb')
+    file2 = open('everyclass/auth/static/everyclass_icon.png', 'rb')
     message_image = MIMEImage(file2.read())
     file2.close()
 
