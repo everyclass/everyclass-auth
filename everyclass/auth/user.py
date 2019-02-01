@@ -29,7 +29,7 @@ def register_by_password():
     user_information = {"request_id": request_id, "username": username, "password": password, "method": "password"}
     user_queue.put(user_information)
 
-    logger.info('student_id:%s request registering by password' % username)
+    logger.info('New request: %s wants to verify by password' % username)
 
     return jsonify({"acknowledged": True,
                     "message"     : 'Success putting request to handle queue'
@@ -57,7 +57,7 @@ def register_by_email():
     user_information = {"request_id": request_id, "username": username, "method": "email"}
     user_queue.put(user_information)
 
-    logger.info('student_id:%s request registering by email' % username)
+    logger.info('New request: %s wants to verify by email' % username)
 
     return jsonify({"acknowledged": True,
                     "message"     : 'Success putting request to handle queue'

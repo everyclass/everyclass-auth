@@ -147,18 +147,19 @@ def create_app(offline=False):
     __app = app
 
     # 开一个新线程来运行队列函数
-    threading.Thread(target=start_register_queue).start()
+    # todo: 通过配置文件定义线程数
+    threading.Thread(target=queue_worker).start()
 
     return app
 
 
-def start_register_queue():
+def queue_worker():
     """
     启动用于缓存用户请求的队列
     如果为空则等待至有元素被加入队列
     并通过请求不同的验证方式调用不同的处理函数
     """
-    logger.debug('call start register queue')
+    logger.debug('Queue worker started')
     global __app
     ctx = __app.app_context()
     ctx.push()
