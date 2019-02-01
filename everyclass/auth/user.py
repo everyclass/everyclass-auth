@@ -31,10 +31,9 @@ def register_by_password():
 
     logger.info('student_id:%s request registering by password' % username)
 
-    return jsonify({
-        "success": True,
-        "message": 'request in handle queue success'
-    })
+    return jsonify({"acknowledged": True,
+                    "message"     : 'Success putting request to handle queue'
+                    })
 
 
 @user_blueprint.route('/register_by_email', methods=['POST'])
@@ -60,10 +59,9 @@ def register_by_email():
 
     logger.info('student_id:%s request registering by email' % username)
 
-    return jsonify({
-        "success": True,
-        "message": 'request in handle queue success'
-    })
+    return jsonify({"acknowledged": True,
+                    "message"     : 'Success putting request to handle queue'
+                    })
 
 
 @user_blueprint.route('/identifying_email_code', methods=['POST'])
