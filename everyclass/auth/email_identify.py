@@ -26,7 +26,7 @@ def send_email(email, token):
     mail_user = config.EMAIL['USERNAME']  # 用户名
     mail_pass = config.EMAIL['PASSWORD']  # 口令
 
-    sender = config.EMAIL['sender']
+    sender = config.EMAIL['SENDER']
     receivers = email
     # message = MIMEText(token, 'html', 'utf-8')
     message = MIMEMultipart('related')
@@ -54,7 +54,7 @@ def send_email(email, token):
     message.attach(message_image)
 
     smtpObj = smtplib.SMTP()
-    smtpObj.connect(mail_host, config.EMAIL['SMTP_port'])  # SMTP 端口号
+    smtpObj.connect(mail_host, config.EMAIL['PORT'])  # SMTP 端口号
 
     smtpObj.ehlo()
     smtpObj.starttls()
