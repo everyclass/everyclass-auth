@@ -83,7 +83,7 @@ def identifying_email_code():
         })
     user_inf_by_token = redis_client.get("auth:email_token:%s" % email_code)
     if not user_inf_by_token:
-        logger.info('no user for email_code %s' % email_code)
+        logger.warning('no user for email_code %s' % email_code)
         return jsonify({
             'success': False,
             'message': 'no user for email_code'
@@ -111,6 +111,13 @@ def get_identifying_result():
             }
     """
     request_id = str(request.json.get('request_id'))
-    # 通过redis取出的信息格式为auth:request_state:message
-    message = (redis_client.get(request_id)).split(':')[2]
-    return message
+    if not request_id:
+        logger.info('There is no message for %s' % request_id)
+        return jsonify({
+            'success': False,
+            'message': "There is no message for designated request_id"
+        })
+    else:
+        # 通过redis取出的信息格式为auth:request_states:message
+        message = (redis_client.get("auth:request_status:" + request_id)).split(':')[2]
+        return message

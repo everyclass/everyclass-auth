@@ -41,7 +41,7 @@ class RedisQueue(object):
 
         if check_if_request_id_exist(request_id):
             logger.warning("request_id as primary key reuses")
-            return False, 'internal error'
+            return False, 'request_id as primary key reuses'
 
         if check_if_have_registered(username):
             redis_client.set("auth:request_status:%s" % request_id, 'student has registered', ex=86400)
@@ -76,7 +76,7 @@ class RedisQueue(object):
 
         if check_if_request_id_exist(request_id):
             logger.warning("request_id as primary key reuses")
-            return False, 'internal error'
+            return False, 'request_id as primary key reuses'
 
         if check_if_have_registered(username):
             redis_client.set("auth:request_status:%s" % request_id, 'student has registered', ex=86400)
@@ -90,4 +90,5 @@ class RedisQueue(object):
         redis_client.set("auth:request_status:%s" % request_id, 'sendEmail success', ex=86400)
         request_info = "%s:%s" % (request_id, username)
         redis_client.set("auth:email_token:%s" % token, request_info, ex=86400)
+        logger.debug("auth:email_token:%s" % token)
         return True, 'sendEmail success'

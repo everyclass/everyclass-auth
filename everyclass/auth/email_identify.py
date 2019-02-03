@@ -68,3 +68,4 @@ def _format_address(email):
     """邮件地址的格式化"""
     name, address = parseaddr(email)
     return formataddr((Header(name, 'utf-8').encode(), address))
+

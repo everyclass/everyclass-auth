@@ -11,19 +11,17 @@ def init_pool(current_app):
                                       mincached=1,
                                       maxcached=5,
                                       maxconnections=100,
-                                      host=current_app.config['MYSQL_CONFIG']['host'],
-                                      user=current_app.config['MYSQL_CONFIG']['user'],
-                                      passwd=current_app.config['MYSQL_CONFIG']['password'],
-                                      db=current_app.config['MYSQL_CONFIG']['db'],
-                                      port=current_app.config['MYSQL_CONFIG']['port'],
-                                      charset=current_app.config['MYSQL_CONFIG']['charset'])
+                                      host=current_app.config['MYSQL_CONFIG']['HOST'],
+                                      user=current_app.config['MYSQL_CONFIG']['USER'],
+                                      passwd=current_app.config['MYSQL_CONFIG']['PASSWORD'],
+                                      db=current_app.config['MYSQL_CONFIG']['DB'],
+                                      port=current_app.config['MYSQL_CONFIG']['PORT'],
+                                      charset=current_app.config['MYSQL_CONFIG']['CHARSET'])
 
 
 def get_connection():
     """在连接池中获得连接"""
     return app.mysql_pool.connection()
-
-    # return pymysql.Connection(**config.MYSQL_CONFIG)
 
 
 def check_if_have_registered(username):

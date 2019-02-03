@@ -34,28 +34,27 @@ def simulate_login_noidentifying(username: str, password: str):
     while identifying_time < 10:
         identifying_time = identifying_time + 1
 
-        name_input = driver.find_element_by_id("userAccount")  # 找到用户名的框框
-        pass_input = driver.find_element_by_id('userPassword')  # 找到输入密码的框框
-        name_input.clear()
-        name_input.send_keys(username)  # 填写用户名
-        time.sleep(0.2)
-        pass_input.clear()
-        pass_input.send_keys(password)  # 填写密码
-        time.sleep(0.3)
+        try:
+            name_input = driver.find_element_by_id("userAccount")  # 找到用户名的框框
+            pass_input = driver.find_element_by_id('userPassword')  # 找到输入密码的框框
+            name_input.clear()
+            name_input.send_keys(username)  # 填写用户名
+            time.sleep(0.2)
+            pass_input.clear()
+            pass_input.send_keys(password)  # 填写密码
+            time.sleep(0.3)
 
-        login_button = driver.find_element_by_id('btnSubmit')  # 找到登录按钮
-        login_button.click()  # 点击登录
+            login_button = driver.find_element_by_id('btnSubmit')  # 找到登录按钮
+            login_button.click()  # 点击登录
+        except Exception as e:
+            logger.warning('Simulated login throws an error：' + e.message)
+            break
 
-        # alert = driver.switch_to.alert
-        # print(alert)
-        # # alert.accept()
-        #
-        # print(alert.text)
         try:
             driver.refresh()
         # 出现alert，一般是用户名或者密码为空或者是其他特殊情况
         except UnexpectedAlertPresentException:
-            logger.debug('arise alert')
+            logger.warning('arise alert')
             alert = driver.switch_to.alert
             # alert.accept()
             return False, 'arise alert' + alert.text
@@ -160,3 +159,7 @@ def simulate_login(username: str, password: str):
     # 验证码识别多次后仍然失败
     logger.warning('identifying code mistakes too much times')
     return False, 'identifying code mistakes too much times'
+
+
+
+
