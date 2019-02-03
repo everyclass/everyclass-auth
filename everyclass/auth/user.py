@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from auth.handle_register_queue import RedisQueue, redis_client
 from everyclass.auth import logger
-from everyclass.auth.db.mysql import insert_email_account
+from everyclass.auth.db.mysql import insert_email_account, check_if_request_id_exist
 from everyclass.auth.utils import json_payload
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/user')
@@ -93,8 +93,9 @@ def identifying_email_code():
     user_inf = bytes.decode(user_inf_by_token).split(':')
     request_id = user_inf[0]
     username = user_inf[1]
-    insert_email_account(request_id, username, 'email', email_code)
     logger.info('student_id:%s identifying success' % username)
+    if not check_if_request_id_exist(request_id):
+        insert_email_account(request_id, username, 'email', email_code)
     return jsonify({
         'success': True
     })
@@ -118,6 +119,6 @@ def get_identifying_result():
             'message': "There is no message for designated request_id"
         })
     else:
-        # 通过redis取出的信息格式为auth:request_states:message
-        message = (redis_client.get("auth:request_status:" + request_id)).split(':')[2]
+        # 通过redis取出的信息格式为auth:request_status:message
+        message = (redis_client.get("auth:request_status:" + request_id))
         return message
