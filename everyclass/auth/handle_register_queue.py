@@ -1,9 +1,9 @@
 import uuid
 
-from everyclass.auth.db.mysql import check_if_request_id_exist, check_if_have_registered, insert_browser_account
 from everyclass.auth import logger
-from everyclass.auth.db.redisdb import redis_client
 from everyclass.auth.browse_identify import simulate_login_noidentifying
+from everyclass.auth.db.mysql import check_if_have_registered, check_if_request_id_exist, insert_browser_account
+from everyclass.auth.db.redisdb import redis_client
 from everyclass.auth.email_identify import send_email
 
 
@@ -11,6 +11,7 @@ class RedisQueue(object):
     """
     redis队列类
     """
+
     def __init__(self, name, namespace='queue'):
         # redis的默认参数为：host='localhost', port=6379, db=0， 其中db为定义redis database的数量
         self.__db = redis_client
@@ -37,8 +38,6 @@ class RedisQueue(object):
         处理redis队列中的通过浏览器验证的请求
 
         """
-        from everyclass.auth.handle_register_queue import redis_client
-
         if check_if_request_id_exist(request_id):
             logger.warning("request_id as primary key reuses")
             return False, 'request_id as primary key reuses'
@@ -72,7 +71,6 @@ class RedisQueue(object):
         :param request_id: str, 请求 ID
         :param username: str, 学号
         """
-        from everyclass.auth.handle_register_queue import redis_client
 
         if check_if_request_id_exist(request_id):
             logger.warning("request_id as primary key reuses")
