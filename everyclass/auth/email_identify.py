@@ -1,13 +1,12 @@
+import smtplib
+from email.header import Header
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.header import Header
-from email.utils import parseaddr, formataddr
+from email.utils import formataddr, parseaddr
 
-import smtplib
-
-from everyclass.auth.config import get_config
 from everyclass.auth import logger
+from everyclass.auth.config import get_config
 
 config = get_config()
 
@@ -20,11 +19,6 @@ def send_email(email, token):
     """
 
     logger.info("Sending email to {}".format(email))
-
-    # 第三方 SMTP 服务
-    mail_host = config.EMAIL['HOST']  # 设置服务器
-    mail_user = config.EMAIL['USERNAME']  # 用户名
-    mail_pass = config.EMAIL['PASSWORD']  # 口令
 
     sender = config.EMAIL['SENDER']
     receivers = email
@@ -53,15 +47,15 @@ def send_email(email, token):
     message_image.add_header('Content-ID', '<image1>')
     message.attach(message_image)
 
-    smtpObj = smtplib.SMTP()
-    smtpObj.connect(mail_host, config.EMAIL['PORT'])  # SMTP 端口号
+    smtp_obj = smtplib.SMTP(host=config.EMAIL['HOST'], port=config.EMAIL['PORT'])
+    smtp_obj.connect(host=config.EMAIL['HOST'], port=config.EMAIL['PORT'])  # SMTP 端口号
 
-    smtpObj.ehlo()
-    smtpObj.starttls()
+    smtp_obj.ehlo()
+    smtp_obj.starttls()
 
-    smtpObj.login(mail_user, mail_pass)
-    smtpObj.sendmail(sender, receivers, message.as_string())
-    smtpObj.quit()
+    smtp_obj.login(config.EMAIL['USERNAME'], config.EMAIL['PASSWORD'])
+    smtp_obj.sendmail(sender, receivers, message.as_string())
+    smtp_obj.quit()
 
 
 def _format_address(email):
