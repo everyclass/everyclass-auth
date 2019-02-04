@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 
 from auth.handle_register_queue import RedisQueue, redis_client
 from everyclass.auth import logger
-from everyclass.auth.db.mysql import insert_email_account, check_if_request_id_exist
+from everyclass.auth.db.mysql import check_if_request_id_exist, insert_email_account
 from everyclass.auth.utils import json_payload
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/user')
@@ -105,18 +105,17 @@ def identifying_email_code():
 @json_payload('request_id', supposed_type=str)
 def get_identifying_result():
     """
-            根据requestid获取服务器验证的判断结果
-            期望格式：
-            {
-                "request_id":"123"
-            }
+    根据requestid获取服务器验证的判断结果
+    期望格式：
+    {
+        "request_id":"123"
+    }
     """
     request_id = str(request.json.get('request_id'))
     if not request_id:
-        logger.info('There is no message for %s' % request_id)
         return jsonify({
-            'success': False,
-            'message': "request_id is empty"
+            'acknowledged': False,
+            'message'     : "field `request_id` is empty"
         })
     # 通过redis取出的信息格式为auth:request_status:message
     message = (redis_client.get("auth:request_status:" + request_id))
@@ -125,8 +124,13 @@ def get_identifying_result():
     if not message:
         logger.info('There is no message for %s' % request_id)
         return jsonify({
-            'success': False,
-            'message': "There is no message for designated request_id"
+            'acknowledged': True,
+            "verified"    : False,
+            'message'     : "request_id does not exist or expired"
         })
 
-    return message
+    return jsonify({
+        "acknowledged": True,
+        "verified"    : True,
+        "message"     : message.decode()
+    })
