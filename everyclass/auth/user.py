@@ -101,7 +101,7 @@ def identifying_email_code():
     })
 
 
-@user_blueprint.route('/get_identifying_result', methods=['POST'])
+@user_blueprint.route('/get_identifying_result')
 @json_payload('request_id', supposed_type=str)
 def get_identifying_result():
     """
