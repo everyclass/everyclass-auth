@@ -116,9 +116,18 @@ def get_identifying_result():
         logger.info('There is no message for %s' % request_id)
         return jsonify({
             'success': False,
+            'message': "request_id is empty"
+        })
+    # 通过redis取出的信息格式为auth:request_status:message
+    message = (redis_client.get("auth:request_status:" + request_id))
+    logger.debug(message)
+
+    if not message:
+        logger.info('There is no message for %s' % request_id)
+        return jsonify({
+            'success': False,
             'message': "There is no message for designated request_id"
         })
-    else:
-        # 通过redis取出的信息格式为auth:request_status:message
-        message = (redis_client.get("auth:request_status:" + request_id))
-        return message
+
+    return message
+
