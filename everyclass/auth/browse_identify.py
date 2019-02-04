@@ -159,7 +159,3 @@ def simulate_login(username: str, password: str):
     # 验证码识别多次后仍然失败
     logger.warning('identifying code mistakes too much times')
     return False, 'identifying code mistakes too much times'
-
-
-
-

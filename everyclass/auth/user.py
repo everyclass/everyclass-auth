@@ -130,4 +130,3 @@ def get_identifying_result():
         })
 
     return message
-
