@@ -2,5 +2,5 @@ everyclass/auth/config/development.py
 .idea
 everyclass/auth/pic
 everyclass/auth/test
-
+everyclass-auth/server.py
 **/__pycache__/

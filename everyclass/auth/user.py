@@ -96,6 +96,7 @@ def identifying_email_code():
     logger.info('student_id:%s identifying success' % username)
     if not check_if_request_id_exist(request_id):
         insert_email_account(request_id, username, 'email', email_code)
+    redis_client.set("auth:request_status:%s" % request_id, 'identify a student in csu', ex=86400)
     return jsonify({
         'success': True
     })
