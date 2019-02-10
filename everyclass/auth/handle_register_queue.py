@@ -46,14 +46,14 @@ class RedisQueue(object):
         if check_if_have_registered(username):
             redis_client.set("auth:request_status:%s" % request_id, Message.ACCOUNT_REGISTERED, ex=86400)
             logger.info("In handle request   Account: %s repeat registration" % username)
-            return False, Message.WRONG
+            return False, Message.REPEAT_REGISTRATION
 
         # 判断该用户是否为中南大学学生
         # result数组第一个参数为bool类型判断验证是否成功，第二个参数为出错原因
         result = simulate_login_noidentifying(username, password)
 
         # 验证失败
-        # result[1]值为"ERROR"：内部错误，值为"WRONG"：用户输入错误（密码错误）
+        # result[0]为验证的结果，result[1]为具体的原因
         if not result[0]:
             redis_client.set("auth:request_status:%s" % request_id, result[1], ex=86400)
             logger.info("In handle request   Account: %s " % username + result[1])
@@ -64,7 +64,7 @@ class RedisQueue(object):
         logger.info('Account: %s identify success' % username)
         insert_browser_account(request_id, username, 'browser')
 
-        return True, 'identify a student in csu'
+        return True, Message.SUCCESS
 
     def handle_email_register_request(self, request_id: str, username: str):
         """
@@ -81,7 +81,7 @@ class RedisQueue(object):
         if check_if_have_registered(username):
             redis_client.set("auth:request_status:%s" % request_id, Message.ACCOUNT_REGISTERED, ex=86400)
             logger.info("In handle request   Account: %s repeat registration" % username)
-            return False, Message.WRONG
+            return False, Message.ACCOUNT_REGISTERED
 
         email = username + "@csu.edu.cn"
         token = str(uuid.uuid1())

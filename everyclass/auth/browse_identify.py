@@ -64,7 +64,7 @@ def simulate_login_noidentifying(username: str, password: str):
             # 出现密码错误的提示
             if prompt[0].text == '用户名或密码错误':
                 logger.debug('password wrong')
-                return False, Message.WRONG
+                return False, Message.PASSWORD_WRONG
             # 出现其他提示
             else:
                 logger.warning("In simulated login  Account: % s "
@@ -137,14 +137,14 @@ def simulate_login(username: str, password: str):
             return False, Message.ERROR
 
         if driver.current_url == 'http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp':
-            return True, 'identifying success'
+            return True, Message.SUCCESS
 
         # 出现红色提示
         prompt = driver.find_elementsre_by_css_selector("font[color='red']")
         if len(prompt) > 0:
             # 出现密码错误的提示
             if prompt[0].text == '该帐号不存在或密码错误,请联系管理员!':
-                return False, Message.WRONG
+                return False, Message.PASSWORD_WRONG
 
             # 离奇抽风时会刷新网页，需要重新输入用户名和密码
             if prompt[0] == '用户名或密码为空!':

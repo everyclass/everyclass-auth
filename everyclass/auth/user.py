@@ -33,7 +33,7 @@ def register_by_password():
     logger.info('New request: %s wants to verify by password' % username)
 
     return jsonify({"acknowledged": True,
-                    "message"     : Message.PUT_INTO_QUEUE
+                    "message"     : Message.SUCCESS
                     })
 
 
@@ -61,7 +61,7 @@ def register_by_email():
     logger.info('New request: %s wants to verify by email' % username)
 
     return jsonify({"acknowledged": True,
-                    "message"     : Message.PUT_INTO_QUEUE
+                    "message"     : Message.SUCCESS
                     })
 
 
@@ -78,10 +78,10 @@ def identifying_email_code():
     email_code = request.json.get('email_code')
     user_inf_by_token = redis_client.get("auth:email_token:%s" % email_code)
     if not user_inf_by_token:
-        logger.warning('In identifying email code no user information for invalid email_code %s' % email_code)
+        logger.info('In identifying email code no user information for invalid email_code %s' % email_code)
         return jsonify({
-            'success': False,
-            'message': Message.INVALID_EMAIL_CODE
+            'acknowledged': True,
+            'message'     : Message.INVALID_EMAIL_CODE
         })
     # 通过的user_inf_by_token取到的数据格式为request_id:username
     logger.debug(user_inf_by_token)
@@ -93,7 +93,8 @@ def identifying_email_code():
         insert_email_account(request_id, username, 'email', email_code)
     redis_client.set("auth:request_status:%s" % request_id, Message.IDENTIFYING_SUCCESS, ex=86400)
     return jsonify({
-        'success': True
+        'acknowledged': True,
+        'message'     : Message.SUCCESS
     })
 
 
@@ -117,7 +118,7 @@ def get_identifying_result():
         return jsonify({
             'acknowledged': True,
             "verified"    : False,
-            'message'     : "request_id does not exist or expired"
+            'message'     : Message.INVALID_REQUESTID
         })
 
     return jsonify({
