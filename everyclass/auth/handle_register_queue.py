@@ -5,6 +5,7 @@ from everyclass.auth.browse_identify import simulate_login_noidentifying
 from everyclass.auth.db.mysql import check_if_have_registered, check_if_request_id_exist, insert_browser_account
 from everyclass.auth.db.redisdb import redis_client
 from everyclass.auth.email_identify import send_email
+from everyclass.auth.config.message import Message
 
 
 class RedisQueue(object):
@@ -39,27 +40,28 @@ class RedisQueue(object):
 
         """
         if check_if_request_id_exist(request_id):
-            logger.warning("request_id as primary key reuses")
-            return False, 'request_id as primary key reuses'
+            logger.warning("In handle request   Account: %s request_id as primary key reuses" % username)
+            return False, Message.ERROR
 
         if check_if_have_registered(username):
-            redis_client.set("auth:request_status:%s" % request_id, 'student has registered', ex=86400)
-            logger.info('student_id:%s identify fail becacuse id has registered' % username)
-            return False, 'student has registered'
+            redis_client.set("auth:request_status:%s" % request_id, Message.ACCOUNT_REGISTERED, ex=86400)
+            logger.info("In handle request   Account: %s repeat registration" % username)
+            return False, Message.WRONG
 
         # 判断该用户是否为中南大学学生
         # result数组第一个参数为bool类型判断验证是否成功，第二个参数为出错原因
         result = simulate_login_noidentifying(username, password)
-        logger.debug(result)
-        # 密码错误
+
+        # 验证失败
+        # result[1]值为"ERROR"：内部错误，值为"WRONG"：用户输入错误（密码错误）
         if not result[0]:
-            redis_client.set("auth:request_status:%s" % request_id, 'password wrong', ex=86400)
-            logger.info('student_id:%s identify fail because password wrong' % username)
+            redis_client.set("auth:request_status:%s" % request_id, result[1], ex=86400)
+            logger.info("In handle request   Account: %s " % username + result[1])
             return False, result[1]
 
         # 经判断是中南大学学生，生成token，并将相应数据持久化
-        redis_client.set("auth:request_status:%s" % request_id, 'identify a student in csu', ex=86400)  # 1 day
-        logger.info('student_id:%s identify success' % username)
+        redis_client.set("auth:request_status:%s" % request_id, Message.IDENTIFYING_SUCCESS, ex=86400)  # 1 day
+        logger.info('Account: %s identify success' % username)
         insert_browser_account(request_id, username, 'browser')
 
         return True, 'identify a student in csu'
@@ -73,20 +75,19 @@ class RedisQueue(object):
         """
 
         if check_if_request_id_exist(request_id):
-            logger.warning("request_id as primary key reuses")
-            return False, 'request_id as primary key reuses'
+            logger.warning("In handle request   Account: %s request_id as primary key reuses" % username)
+            return False, Message.ERROR
 
         if check_if_have_registered(username):
-            redis_client.set("auth:request_status:%s" % request_id, 'student has registered', ex=86400)
-            logger.info('student_id:%s identify fail becacuse id has registered' % username)
-            return False, 'student has registered'
+            redis_client.set("auth:request_status:%s" % request_id, Message.ACCOUNT_REGISTERED, ex=86400)
+            logger.info("In handle request   Account: %s repeat registration" % username)
+            return False, Message.WRONG
 
-        logger.debug("use handle_email_register_request")
         email = username + "@csu.edu.cn"
         token = str(uuid.uuid1())
         send_email(email, token)
-        redis_client.set("auth:request_status:%s" % request_id, 'sendEmail success', ex=86400)
+        redis_client.set("auth:request_status:%s" % request_id, Message.SEND_EMAIL_SUCCESS, ex=86400)
         request_info = "%s:%s" % (request_id, username)
         redis_client.set("auth:email_token:%s" % token, request_info, ex=86400)
         logger.debug("auth:email_token:%s" % token)
-        return True, 'sendEmail success'
+        return True, Message.SUCCESS

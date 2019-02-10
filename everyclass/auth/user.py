@@ -4,6 +4,7 @@ from auth.handle_register_queue import RedisQueue, redis_client
 from everyclass.auth import logger
 from everyclass.auth.db.mysql import check_if_request_id_exist, insert_email_account
 from everyclass.auth.utils import json_payload
+from everyclass.auth.config.message import Message
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/user')
 
@@ -32,7 +33,7 @@ def register_by_password():
     logger.info('New request: %s wants to verify by password' % username)
 
     return jsonify({"acknowledged": True,
-                    "message"     : 'Success putting request to handle queue'
+                    "message"     : Message.PUT_INTO_QUEUE
                     })
 
 
@@ -60,7 +61,7 @@ def register_by_email():
     logger.info('New request: %s wants to verify by email' % username)
 
     return jsonify({"acknowledged": True,
-                    "message"     : 'Success putting request to handle queue'
+                    "message"     : Message.PUT_INTO_QUEUE
                     })
 
 
@@ -75,28 +76,22 @@ def identifying_email_code():
         }
     """
     email_code = request.json.get('email_code')
-
-    if not email_code:
-        return jsonify({
-            'success': False,
-            'message': 'no email_code in request'
-        })
     user_inf_by_token = redis_client.get("auth:email_token:%s" % email_code)
     if not user_inf_by_token:
-        logger.warning('no user for email_code %s' % email_code)
+        logger.warning('In identifying email code no user information for invalid email_code %s' % email_code)
         return jsonify({
             'success': False,
-            'message': 'no user for email_code'
+            'message': Message.INVALID_EMAIL_CODE
         })
     # 通过的user_inf_by_token取到的数据格式为request_id:username
     logger.debug(user_inf_by_token)
     user_inf = bytes.decode(user_inf_by_token).split(':')
     request_id = user_inf[0]
     username = user_inf[1]
-    logger.info('student_id:%s identifying success' % username)
+    logger.info('Account:%s identifying success' % username)
     if not check_if_request_id_exist(request_id):
         insert_email_account(request_id, username, 'email', email_code)
-    redis_client.set("auth:request_status:%s" % request_id, 'identify a student in csu', ex=86400)
+    redis_client.set("auth:request_status:%s" % request_id, Message.IDENTIFYING_SUCCESS, ex=86400)
     return jsonify({
         'success': True
     })
@@ -113,11 +108,6 @@ def get_identifying_result():
     }
     """
     request_id = str(request.json.get('request_id'))
-    if not request_id:
-        return jsonify({
-            'acknowledged': False,
-            'message'     : "field `request_id` is empty"
-        })
     # 通过redis取出的信息格式为auth:request_status:message
     message = (redis_client.get("auth:request_status:" + request_id))
     logger.debug(message)
