@@ -12,6 +12,3 @@ class Message:
     SEND_EMAIL_SUCCESS = "SEND_EMAIL_SUCCESS"  # 发送邮件成功
     PUT_INTO_QUEUE = "PUT_INTO_QUEUE"  # 成功将请求插入处理队列
     INVALID_EMAIL_CODE = "INVALID_EMAIL_CODE"  # 用于邮箱验证的验证码无效
-
-
-

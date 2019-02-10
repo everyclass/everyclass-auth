@@ -132,8 +132,8 @@ def simulate_login(username: str, password: str):
         except UnexpectedAlertPresentException:
             alert = driver.switch_to.alert
             alert.accept()
-            logger.warning("In simulated login  Account:" + username +
-                           " arises alert,alert text is: \"" + alert.text + "\"")
+            logger.warning("In simulated login  Account: %s"
+                           "arises alert,alert text is: \"" % username + alert.text + "\"")
             return False, Message.ERROR
 
         if driver.current_url == 'http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp':
