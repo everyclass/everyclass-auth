@@ -45,7 +45,7 @@ class RedisQueue(object):
             return False, Message.ERROR
 
         if check_if_have_registered(username):
-            redis_client.set("auth:request_status:%s" % request_id, Message.ACCOUNT_REGISTERED, ex=86400)
+            redis_client.set("auth:request_status:%s" % request_id, Message.ERROR, ex=86400)
             logger.info("In handle request   Account: %s repeat registration" % username)
             return False, Message.REPEAT_REGISTRATION
 
@@ -80,9 +80,9 @@ class RedisQueue(object):
             return False, Message.ERROR
 
         if check_if_have_registered(username):
-            redis_client.set("auth:request_status:%s" % request_id, Message.ACCOUNT_REGISTERED, ex=86400)
+            redis_client.set("auth:request_status:%s" % request_id, Message.ERROR, ex=86400)
             logger.info("In handle request   Account: %s repeat registration" % username)
-            return False, Message.ACCOUNT_REGISTERED
+            return False, Message.ERROR
 
         email = username + "@csu.edu.cn"
         token = str(uuid.uuid1())
