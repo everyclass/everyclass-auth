@@ -169,7 +169,6 @@ def queue_worker():
 
     user_queue = RedisQueue('everyclass')
     while True:
-        logger.info('Queue worker working...')
         result = user_queue.get_wait()[1]  # 队列返回的第一个参数为频道名，第二个参数为存入的值
         if not result:
             continue
@@ -183,4 +182,3 @@ def queue_worker():
         if request_info['method'] == 'email':
             user_queue.handle_email_register_request(request_info['request_id'],
                                                      request_info['username'])
-        time.sleep(2)
