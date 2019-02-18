@@ -74,5 +74,6 @@ class Config(object):
         'PASSWORD': '12234',
         'SENDER'  : 'mail_sender',
         'PORT'    : 2525
-
     }
+
+    SERVER_BASE_URL = "https://everyclass.xyz"
