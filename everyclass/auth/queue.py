@@ -42,12 +42,12 @@ class RedisQueue(object):
         """
         if check_if_request_id_exist(request_id):
             logger.warning("request_id reuses as primary key")
-            return False, Message.ERROR
+            return False, Message.INTERNAL_ERROR
 
         if check_if_have_registered(username):
-            redis_client.set("auth:request_status:%s" % request_id, Message.ERROR, ex=86400)
+            redis_client.set("auth:request_status:%s" % request_id, Message.INTERNAL_ERROR, ex=86400)
             logger.info("In handle request   Account: %s repeat registration" % username)
-            return False, Message.REPEAT_REGISTRATION
+            return False, Message.INTERNAL_ERROR
 
         # 判断该用户是否为中南大学学生
         # result数组第一个参数为bool类型判断验证是否成功，第二个参数为出错原因
@@ -77,12 +77,12 @@ class RedisQueue(object):
 
         if check_if_request_id_exist(request_id):
             logger.warning("In handle request   Account: %s request_id as primary key reuses" % username)
-            return False, Message.ERROR
+            return False, Message.INTERNAL_ERROR
 
         if check_if_have_registered(username):
-            redis_client.set("auth:request_status:%s" % request_id, Message.ERROR, ex=86400)
+            redis_client.set("auth:request_status:%s" % request_id, Message.INTERNAL_ERROR, ex=86400)
             logger.info("In handle request   Account: %s repeat registration" % username)
-            return False, Message.ERROR
+            return False, Message.INTERNAL_ERROR
 
         email = username + "@csu.edu.cn"
         token = str(uuid.uuid1())

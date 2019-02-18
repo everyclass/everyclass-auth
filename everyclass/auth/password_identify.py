@@ -45,7 +45,7 @@ def simulate_login_noidentifying(username: str, password: str):
         except Exception as e:
             logger.warning("In simulated login  Account: %s "
                            "in find element process throws an error：" % username + e.message)
-            return False, Message.ERROR
+            return False, Message.INTERNAL_ERROR
 
         try:
             driver.refresh()
@@ -53,7 +53,7 @@ def simulate_login_noidentifying(username: str, password: str):
         except UnexpectedAlertPresentException:
             alert = driver.switch_to.alert
             logger.warning("In simulated login  Account:" + username + " arises alert,text is \"" + alert.text + '\"')
-            return False, Message.ERROR
+            return False, Message.INTERNAL_ERROR
 
         if driver.current_url == 'http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp':
             return True, Message.SUCCESS
@@ -69,11 +69,11 @@ def simulate_login_noidentifying(username: str, password: str):
             else:
                 logger.warning("In simulated login  Account: % s "
                                "arises other red prompt,text is \"" % username + str(prompt[0].text) + '\"')
-                return False, Message.ERROR
+                return False, Message.INTERNAL_ERROR
 
     # 验证码识别多次后仍然失败
     logger.warning("In simulated login  Account: %s identifying too much times" % username)
-    return False, Message.ERROR
+    return False, Message.INTERNAL_ERROR
 
 
 def simulate_login(username: str, password: str):
@@ -134,7 +134,7 @@ def simulate_login(username: str, password: str):
             alert.accept()
             logger.warning("In simulated login  Account: %s"
                            "arises alert,alert text is: \"" % username + alert.text + "\"")
-            return False, Message.ERROR
+            return False, Message.INTERNAL_ERROR
 
         if driver.current_url == 'http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp':
             return True, Message.SUCCESS
@@ -164,4 +164,4 @@ def simulate_login(username: str, password: str):
 
     # 验证码识别多次后仍然失败
     logger.warning("In simulated login  Account: %s identifying too much times")
-    return False, Message.ERROR
+    return False, Message.INTERNAL_ERROR

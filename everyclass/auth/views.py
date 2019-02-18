@@ -79,8 +79,7 @@ def verify_email_token():
     if not user_info:
         logger.info('No user information for email token %s' % email_token)
         return jsonify({
-            'success': False,
-            'message': Message.INVALID_EMAIL_TOKEN
+            'success': False
         })
 
     # 通过user_inf_by_token取到的数据格式为request_id:username
