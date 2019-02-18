@@ -13,22 +13,24 @@ user_blueprint = Blueprint('user', __name__, url_prefix='/user')
 @json_payload('request_id', 'student_id', 'password', supposed_type=str)
 def register_by_password():
     """
-        通过教务系统的账户密码验证进行用户注册
+    通过教务系统的账户密码验证进行用户注册
 
-        期望格式：
-        {
-            "request_id":"1",
-            "student_id": "3901160413",
-            "password": "",
-        }
+    期望格式：
+    {
+        "request_id":"1",
+        "student_id": "3901160413",
+        "password": "",
+    }
     """
     request_id = request.json.get('request_id')
     username = request.json.get('student_id')
     password = request.json.get('password')
 
     user_queue = RedisQueue('everyclass')
-    user_information = {"request_id": request_id, "username": username, "password": password, "method": "password"}
-    user_queue.put(user_information)
+    user_queue.put({"request_id": request_id,
+                    "username"  : username,
+                    "password"  : password,
+                    "method"    : "password"})
 
     logger.info('New request: %s wants to verify by password' % username)
 
