@@ -65,36 +65,37 @@ def register_by_email():
                     })
 
 
-@user_blueprint.route('/identifying_email_code', methods=['POST'])
-@json_payload('email_code', supposed_type=str)
-def identifying_email_code():
+@user_blueprint.route('/verify_email_token', methods=['GET'])
+@json_payload('email_token', supposed_type=str)
+def verify_email_token():
     """
-        从用户输入的code判断，该用户是否有注册资格
-        期望格式：
-        {
-            "email_code": "asdda451"
-        }
+    从用户输入的code判断，该用户是否有注册资格
+    期望格式：
+    {
+        "email_token": "123456"
+    }
     """
-    email_code = request.json.get('email_code')
-    user_inf_by_token = redis_client.get("auth:email_token:%s" % email_code)
-    if not user_inf_by_token:
-        logger.info('In identifying email code no user information for invalid email_code %s' % email_code)
+    email_token = request.json.get('email_token')
+    user_info = redis_client.get("auth:email_token:%s" % email_token)
+    if not user_info:
+        logger.info('No user information for email token %s' % email_token)
         return jsonify({
-            'acknowledged': True,
-            'message'     : Message.INVALID_EMAIL_CODE
+            'success': False,
+            'message': Message.INVALID_EMAIL_TOKEN
         })
-    # 通过的user_inf_by_token取到的数据格式为request_id:username
-    logger.debug(user_inf_by_token)
-    user_inf = bytes.decode(user_inf_by_token).split(':')
-    request_id = user_inf[0]
-    username = user_inf[1]
+
+    # 通过user_inf_by_token取到的数据格式为request_id:username
+    user_info = bytes.decode(user_info).split(':')
+    request_id, username = user_info
     logger.info('Account:%s identifying success' % username)
+
     if not check_if_request_id_exist(request_id):
-        insert_email_account(request_id, username, 'email', email_code)
-    redis_client.set("auth:request_status:%s" % request_id, Message.IDENTIFYING_SUCCESS, ex=86400)
+        insert_email_account(request_id, username, 'email', email_token)
+
+    redis_client.set("auth:request_status:%s" % request_id, Message.IDENTIFYING_SUCCESS, ex=86400)  # valid for 1 day
     return jsonify({
-        'acknowledged': True,
-        'message'     : Message.SUCCESS
+        'success': True,
+        'message': Message.SUCCESS
     })
 
 
