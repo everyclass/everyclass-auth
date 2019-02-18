@@ -2,10 +2,6 @@ import functools
 
 from flask import abort, request
 
-from everyclass.auth.config import get_config
-
-config = get_config()
-
 
 def json_payload(*fields, supposed_type=None, supposed_in=None):
     """
