@@ -125,7 +125,6 @@ def get_result():
         })
 
     return jsonify({
-        "acknowledged": True,
-        "verified"    : True,  # todo 根据 message判断成功失败
-        "message"     : message.decode()
+        "success": True,  # todo 根据 message判断成功失败
+        "message": message.decode()
     })
