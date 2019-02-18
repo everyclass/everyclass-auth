@@ -1,7 +1,7 @@
 import uuid
 
 from everyclass.auth import logger
-from everyclass.auth.browse_identify import simulate_login_noidentifying
+from everyclass.auth.password_identify import simulate_login_noidentifying
 from everyclass.auth.db.mysql import check_if_have_registered, check_if_request_id_exist, insert_browser_account
 from everyclass.auth.db.redisdb import redis_client
 from everyclass.auth.email_identify import send_email
