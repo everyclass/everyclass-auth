@@ -97,8 +97,9 @@ def verify_email_token():
 
     redis_client.set("auth:request_status:%s" % request_id, Message.IDENTIFYING_SUCCESS, ex=86400)  # valid for 1 day
     return jsonify({
-        'success': True,
-        'message': Message.SUCCESS
+        'success'   : True,
+        'request_id': request_id,
+        'message'   : Message.SUCCESS
     })
 
 
