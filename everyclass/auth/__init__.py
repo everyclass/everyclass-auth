@@ -134,7 +134,7 @@ def create_app(offline=False):
                                            logger=logger)
         logger.handlers.append(logstash_handler)
 
-    from everyclass.auth.user import user_blueprint
+    from everyclass.auth.views import user_blueprint
     app.register_blueprint(user_blueprint)
 
     # 初始化数据库
