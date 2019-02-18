@@ -2,11 +2,11 @@ import os
 
 from everyclass.auth.config.default import Config as DefaultConfig
 
-_config = None
+_config_inited = False
 
 
 class MixedConfig(DefaultConfig):
-    inited = False
+    pass
 
 
 def get_config():
@@ -14,37 +14,32 @@ def get_config():
     单例配置加载
     :return: Config 类的实例
     """
-
-    from everyclass.auth import logger
-    if MixedConfig.inited:
+    global _config_inited
+    if _config_inited:
         return MixedConfig
     else:
         mode = os.environ.get('MODE')
         _override_config = {}
 
-        try:
-            if mode == 'PRODUCTION':
-                from everyclass.auth.config.production import ProductionConfig
-                _override_config = ProductionConfig
-                MixedConfig.CONFIG_NAME = 'production'
-            elif mode == 'DEVELOPMENT':
-                from everyclass.auth.config.development import DevelopmentConfig
-                _override_config = DevelopmentConfig
-                MixedConfig.CONFIG_NAME = 'development'
-            elif mode == 'STAGING':
-                from everyclass.auth.config.staging import StagingConfig
-                _override_config = StagingConfig
-                MixedConfig.CONFIG_NAME = 'staging'
-            elif mode == 'TESTING':
-                from everyclass.auth.config.testing import TestingConfig
-                _override_config = TestingConfig
-                MixedConfig.CONFIG_NAME = 'testing'
-            else:
-                MixedConfig.CONFIG_NAME = 'default'
-                logger.error('No valid MODE environment variable specified. Default config will be used.')
-        except ImportError:
-            logger.critical('ImportError when importing configuration file')
-            exit(1)
+        if mode == 'PRODUCTION':
+            from everyclass.auth.config.production import ProductionConfig
+            _override_config = ProductionConfig
+            MixedConfig.CONFIG_NAME = 'production'
+        elif mode == 'DEVELOPMENT':
+            from everyclass.auth.config.development import DevelopmentConfig
+            _override_config = DevelopmentConfig
+            MixedConfig.CONFIG_NAME = 'development'
+        elif mode == 'STAGING':
+            from everyclass.auth.config.staging import StagingConfig
+            _override_config = StagingConfig
+            MixedConfig.CONFIG_NAME = 'staging'
+        elif mode == 'TESTING':
+            from everyclass.auth.config.testing import TestingConfig
+            _override_config = TestingConfig
+            MixedConfig.CONFIG_NAME = 'testing'
+        else:
+            MixedConfig.CONFIG_NAME = 'default'
+            print('No valid MODE environment variable specified. Default config will be used.')
 
         for key in dir(_override_config):
             if key.isupper():
@@ -59,5 +54,6 @@ def get_config():
                 else:
                     # 其他类型的值直接覆盖
                     setattr(MixedConfig, key, getattr(_override_config, key))
-        MixedConfig.inited = True
+
+        _config_inited = True
         return MixedConfig
