@@ -2,8 +2,8 @@ from flask import Blueprint, jsonify, request
 
 from everyclass.auth import logger
 from everyclass.auth.db.mysql import check_if_request_id_exist, insert_email_account
-from everyclass.auth.queue import RedisQueue, redis_client
 from everyclass.auth.messages import Message
+from everyclass.auth.queue import RedisQueue, redis_client
 from everyclass.auth.utils import json_payload
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/user')
@@ -86,7 +86,7 @@ def verify_email_token():
     # 通过user_inf_by_token取到的数据格式为request_id:username
     user_info = bytes.decode(user_info).split(':')
     request_id, username = user_info
-    logger.info('Account:%s identifying success' % username)
+    logger.info('User %s email verification success' % username)
 
     if not check_if_request_id_exist(request_id):
         insert_email_account(request_id, username, 'email', email_token)
@@ -120,7 +120,8 @@ def get_result():
             'message': Message.INVALID_REQUEST_ID
         })
 
+    message = message.decode()
     return jsonify({
-        "success": True,  # todo 根据 message判断成功失败
-        "message": message.decode()
+        "success": True if message == Message.IDENTIFYING_SUCCESS else False,
+        "message": message
     })
