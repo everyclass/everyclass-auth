@@ -14,8 +14,9 @@ WORKDIR /var/app
 # - gcc, libpcre3-dev for compiling uWSGI
 # - libffi-dev for installing Python package cffi
 # - libssl-dev for installing Python package cryptography
+# - chromedriver for selenium
 RUN apt-get update \
-    && apt-get install -y procps wget gcc libpcre3-dev git libffi-dev libssl-dev \
+    && apt-get install -y procps wget gcc libpcre3-dev git libffi-dev libssl-dev chromedriver\
     && pip install uwsgi
 
 # install gor
