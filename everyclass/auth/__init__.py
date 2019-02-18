@@ -166,7 +166,7 @@ def queue_worker():
     from everyclass.auth.queue import RedisQueue
     from everyclass.auth.db.redis import redis_client
 
-    user_queue = RedisQueue('task')
+    user_queue = RedisQueue()
     while True:
         result = user_queue.get_wait()[1]  # 队列返回的第一个参数为频道名，第二个参数为存入的值
         if not result:

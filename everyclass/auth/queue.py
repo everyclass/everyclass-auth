@@ -13,7 +13,7 @@ class RedisQueue(object):
     redis队列类
     """
 
-    def __init__(self, name, namespace='auth'):
+    def __init__(self, name='task', namespace='auth'):
         # redis的默认参数为：host='localhost', port=6379, db=0， 其中db为定义redis database的数量
         self._db = redis_client
         self.key = "{namespace}:{key_name}".format(namespace=namespace, key_name=name)
