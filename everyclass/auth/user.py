@@ -4,7 +4,7 @@ from auth.handle_register_queue import RedisQueue, redis_client
 from everyclass.auth import logger
 from everyclass.auth.db.mysql import check_if_request_id_exist, insert_email_account
 from everyclass.auth.utils import json_payload
-from everyclass.auth.config.message import Message
+from everyclass.auth.message import Message
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/user')
 

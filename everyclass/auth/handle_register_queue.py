@@ -5,7 +5,7 @@ from everyclass.auth.browse_identify import simulate_login_noidentifying
 from everyclass.auth.db.mysql import check_if_have_registered, check_if_request_id_exist, insert_browser_account
 from everyclass.auth.db.redisdb import redis_client
 from everyclass.auth.email_identify import send_email
-from everyclass.auth.config.message import Message
+from everyclass.auth.message import Message
 
 
 class RedisQueue(object):

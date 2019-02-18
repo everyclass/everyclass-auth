@@ -4,8 +4,8 @@ from PIL import Image
 from pytesseract import pytesseract
 from selenium import webdriver
 from selenium.common.exceptions import UnexpectedAlertPresentException
-from everyclass.auth.config.message import Message
 
+from everyclass.auth.message import Message
 from everyclass.auth import logger
 
 
@@ -140,7 +140,7 @@ def simulate_login(username: str, password: str):
             return True, Message.SUCCESS
 
         # 出现红色提示
-        prompt = driver.find_elementsre_by_css_selector("font[color='red']")
+        prompt = driver.find_elements_by_css_selector("font[color='red']")
         if len(prompt) > 0:
             # 出现密码错误的提示
             if prompt[0].text == '该帐号不存在或密码错误,请联系管理员!':
