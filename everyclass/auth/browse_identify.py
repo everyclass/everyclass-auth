@@ -5,7 +5,7 @@ from pytesseract import pytesseract
 from selenium import webdriver
 from selenium.common.exceptions import UnexpectedAlertPresentException
 
-from everyclass.auth.message import Message
+from everyclass.auth.messages import Message
 from everyclass.auth import logger
 
 

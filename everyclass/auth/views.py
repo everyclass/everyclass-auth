@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from everyclass.auth import logger
 from everyclass.auth.db.mysql import check_if_request_id_exist, insert_email_account
 from everyclass.auth.handle_register_queue import RedisQueue, redis_client
-from everyclass.auth.message import Message
+from everyclass.auth.messages import Message
 from everyclass.auth.utils import json_payload
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/user')
