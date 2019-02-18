@@ -19,13 +19,10 @@ RUN apt-get update \
     && apt-get install -y procps wget gcc libpcre3-dev git libffi-dev libssl-dev chromedriver\
     && pip install uwsgi
 
-# install gor
-RUN cd / \
-    && mkdir gor \
-    && cd gor \
-    && wget https://github.com/buger/goreplay/releases/download/v0.16.1/gor_0.16.1_x64.tar.gz \
-    && tar xzf gor_0.16.1_x64.tar.gz \
-    && rm gor_0.16.1_x64.tar.gz
+# install google chrome
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && apt install -y ./google-chrome-stable_current_amd64.deb \
+    && rm ./google-chrome-stable_current_amd64.deb
 
 COPY . /var/app
 

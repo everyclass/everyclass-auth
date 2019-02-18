@@ -21,6 +21,7 @@ def simulate_login_noidentifying(username: str, password: str):
     options = webdriver.ChromeOptions()
     # 把chrome设置成无界面模式
     options.add_argument('headless')
+    options.add_argument("--no-sandbox")
     # 创建chrome无界面对象
     driver = webdriver.Chrome(chrome_options=options)
     url = "http://csujwc.its.csu.edu.cn/jsxsd/view/xskb/queryglkb.jsp#"
