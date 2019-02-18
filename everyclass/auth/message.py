@@ -5,7 +5,7 @@ class Message:
     PASSWORD_WRONG = "PASSWORD_WRONG"  # 密码错误
     REPEAT_REGISTRATION = "REPEAT_REGISTRATION "  # 该用户已注册
     INVALID_EMAIL_TOKEN = "INVALID_EMAIL_CODE"  # 用于邮箱验证的验证码无效
-    INVALID_REQUESTID = "INVALID_REQUESTID"  # 请求中提供的requestID不存在或已过期
+    INVALID_REQUEST_ID = "INVALID_REQUESTID"  # 请求中提供的requestID不存在或已过期
 
     # 以下字段用于描述各个账户的不同状态
     IDENTIFYING_SUCCESS = "IDENTIFYING_SUCCESS"  # 验证成功

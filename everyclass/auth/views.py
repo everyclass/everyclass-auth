@@ -102,27 +102,26 @@ def verify_email_token():
     })
 
 
-@user_blueprint.route('/get_identifying_result')
+@user_blueprint.route('/get_result')
 @json_payload('request_id', supposed_type=str)
-def get_identifying_result():
+def get_result():
     """
-    根据requestid获取服务器验证的判断结果
+    根据 request_id 获取服务器验证结果
     期望格式：
     {
         "request_id":"123"
     }
     """
     request_id = str(request.json.get('request_id'))
-    # 通过redis取出的信息格式为auth:request_status:message
+    # 通过redis取出的信息格式为 auth:request_status:message
     message = (redis_client.get("auth:request_status:" + request_id))
     logger.debug(message)
 
     if not message:
         logger.info('There is no message for %s' % request_id)
         return jsonify({
-            'acknowledged': True,
-            "verified"    : False,
-            'message'     : Message.INVALID_REQUESTID
+            'success': False,
+            'message': Message.INVALID_REQUEST_ID
         })
 
     return jsonify({
