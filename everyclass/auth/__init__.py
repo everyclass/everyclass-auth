@@ -169,16 +169,18 @@ def queue_worker():
 
     user_queue = RedisQueue('everyclass')
     while True:
-        logger.info('RedisQueue start')
-        # 队列返回的第一个参数为频道名，第二个参数为存入的值
-        result = user_queue.get_wait()[1]
+        logger.info('Queue worker working...')
+        result = user_queue.get_wait()[1]  # 队列返回的第一个参数为频道名，第二个参数为存入的值
         if not result:
             continue
-        user_inf_str = bytes.decode(result)
-        user_inf_str = re.sub('\'', '\"', user_inf_str)
-        user_inf = json.loads(user_inf_str)
-        if user_inf['method'] == 'password':
-            user_queue.handle_browser_register_request(user_inf['request_id'], user_inf['username'], user_inf['password'])
-        if user_inf['method'] == 'email':
-            user_queue.handle_email_register_request(user_inf['request_id'], user_inf['username'])
+        request_info = bytes.decode(result)
+        request_info = re.sub('\'', '\"', request_info)
+        request_info = json.loads(request_info)
+        if request_info['method'] == 'password':
+            user_queue.handle_browser_register_request(request_info['request_id'],
+                                                       request_info['username'],
+                                                       request_info['password'])
+        if request_info['method'] == 'email':
+            user_queue.handle_email_register_request(request_info['request_id'],
+                                                     request_info['username'])
         time.sleep(2)
