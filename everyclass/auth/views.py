@@ -41,13 +41,13 @@ def register_by_password():
 @json_payload('request_id', 'student_id', supposed_type=str)
 def register_by_email():
     """
-        通过学校邮箱验证的方式进行用户注册
+    通过学校邮箱验证的方式进行用户注册
 
-        期望格式：
-        {
-            "request_id": "123"
-            "student_id": "3901160413"
-        }
+    期望格式：
+    {
+        "request_id": "123"
+        "student_id": "3901160413"
+    }
     """
 
     request_id = request.json.get("request_id")
@@ -55,8 +55,9 @@ def register_by_email():
     username = student_id
 
     user_queue = RedisQueue('everyclass')
-    user_information = {"request_id": request_id, "username": username, "method": "email"}
-    user_queue.put(user_information)
+    user_queue.put({"request_id": request_id,
+                    "username"  : username,
+                    "method"    : "email"})
 
     logger.info('New request: %s wants to verify by email' % username)
 
