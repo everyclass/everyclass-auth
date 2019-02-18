@@ -51,18 +51,17 @@ class RedisQueue(object):
 
         # 判断该用户是否为中南大学学生
         # result数组第一个参数为bool类型判断验证是否成功，第二个参数为出错原因
-        result = simulate_login_noidentifying(username, password)
+        success, cause = simulate_login_noidentifying(username, password)
 
         # 验证失败
-        # result[0]为验证的结果，result[1]为具体的原因
-        if not result[0]:
-            redis_client.set("auth:request_status:%s" % request_id, result[1], ex=86400)
-            logger.info("In handle request   Account: %s " % username + result[1])
-            return False, result[1]
+        if not success:
+            redis_client.set("auth:request_status:%s" % request_id, cause, ex=86400)
+            logger.info("User {} password verification failed({}).".format(username, cause))
+            return False, cause
 
         # 经判断是中南大学学生，生成token，并将相应数据持久化
         redis_client.set("auth:request_status:%s" % request_id, Message.IDENTIFYING_SUCCESS, ex=86400)  # 1 day
-        logger.info('Account: %s identify success' % username)
+        logger.info('User %s password verification success.' % username)
         insert_browser_account(request_id, username, 'browser')
 
         return True, Message.SUCCESS

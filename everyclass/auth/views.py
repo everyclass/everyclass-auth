@@ -34,9 +34,7 @@ def register_by_password():
 
     logger.info('New request: %s wants to verify by password' % username)
 
-    return jsonify({"acknowledged": True,
-                    "message"     : Message.SUCCESS
-                    })
+    return jsonify({"acknowledged": True})
 
 
 @user_blueprint.route('/register_by_email', methods=['POST'])
@@ -63,9 +61,7 @@ def register_by_email():
 
     logger.info('New request: %s wants to verify by email' % username)
 
-    return jsonify({"acknowledged": True,
-                    "message"     : Message.SUCCESS
-                    })
+    return jsonify({"acknowledged": True})
 
 
 @user_blueprint.route('/verify_email_token', methods=['GET'])
@@ -98,8 +94,7 @@ def verify_email_token():
     redis_client.set("auth:request_status:%s" % request_id, Message.IDENTIFYING_SUCCESS, ex=86400)  # valid for 1 day
     return jsonify({
         'success'   : True,
-        'request_id': request_id,
-        'message'   : Message.SUCCESS
+        'request_id': request_id
     })
 
 
@@ -114,12 +109,12 @@ def get_result():
     }
     """
     request_id = str(request.json.get('request_id'))
-    # 通过redis取出的信息格式为 auth:request_status:message
-    message = (redis_client.get("auth:request_status:" + request_id))
+
+    message = redis_client.get("auth:request_status:" + request_id)
     logger.debug(message)
 
     if not message:
-        logger.info('There is no message for %s' % request_id)
+        logger.info('request_id {} not found when querying'.format(request_id))
         return jsonify({
             'success': False,
             'message': Message.INVALID_REQUEST_ID
