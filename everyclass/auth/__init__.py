@@ -29,15 +29,6 @@ try:
         """enable garbage collection"""
         gc.set_threshold(700)
 
-
-    @uwsgidecorators.postfork
-    def init_db():
-        """init database connection"""
-        global __app
-        logger.info("Connecting to MongoDB...")
-        init_pool(__app)
-
-
     @uwsgidecorators.postfork
     def init_log_handlers():
         """init log handlers"""
@@ -47,19 +38,6 @@ try:
         global __app, __sentry_available
 
         logger.info("Init log handlers...")
-
-        # Sentry
-        if __app.config['CONFIG_NAME'] in __app.config['SENTRY_AVAILABLE_IN']:
-            sentry.init_app(app=__app)
-            sentry_handler = SentryHandler(sentry.client, level='WARNING')  # Sentry 只处理 WARNING 以上的
-            logger.handlers.append(sentry_handler)
-            __sentry_available = True
-            logger.info('You are in {} mode, so Sentry is inited.'.format(__app.config['CONFIG_NAME']))
-
-        # Elastic APM
-        if __app.config['CONFIG_NAME'] in __app.config['APM_AVAILABLE_IN']:
-            ElasticAPM(__app)
-            logger.info('You are in {} mode, so APM is inited.'.format(__app.config['CONFIG_NAME']))
 
         # Logstash centralized log
         if __app.config['CONFIG_NAME'] in __app.config['LOGSTASH_AVAILABLE_IN']:
@@ -71,6 +49,24 @@ try:
                                                filter=lambda r, h: r.level >= 11)  # do not send DEBUG
             logger.handlers.append(logstash_handler)
             logger.info('You are in {} mode, so LogstashHandler is inited.'.format(__app.config['CONFIG_NAME']))
+        # Sentry
+        if __app.config['CONFIG_NAME'] in __app.config['SENTRY_AVAILABLE_IN']:
+            sentry.init_app(app=__app)
+            sentry_handler = SentryHandler(sentry.client, level='WARNING')  # Sentry 只处理 WARNING 以上的
+            logger.handlers.append(sentry_handler)
+            __sentry_available = True
+            logger.info('You are in {} mode, so Sentry is inited.'.format(__app.config['CONFIG_NAME']))
+        # Elastic APM
+        if __app.config['CONFIG_NAME'] in __app.config['APM_AVAILABLE_IN']:
+            ElasticAPM(__app)
+            logger.info('You are in {} mode, so APM is inited.'.format(__app.config['CONFIG_NAME']))
+
+    @uwsgidecorators.postfork
+    def init_db():
+        """init database connection"""
+        global __app
+        logger.info("Connecting to MongoDB...")
+        init_pool(__app)
 
     @uwsgidecorators.postfork
     def init_queue_worker():
