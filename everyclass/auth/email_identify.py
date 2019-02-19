@@ -57,6 +57,8 @@ def send_email(email, token):
     smtp_obj.sendmail(sender, receivers, message.as_string())
     smtp_obj.quit()
 
+    logger.info("Send email to user {} with token {}".format(email, token))
+
 
 def _format_address(email):
     """邮件地址的格式化"""

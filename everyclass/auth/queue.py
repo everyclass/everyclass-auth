@@ -41,12 +41,12 @@ class RedisQueue(object):
 
         """
         if check_if_request_id_exist(request_id):
-            logger.warning("request_id reuses as primary key")
+            logger.warning("request_id reuses as primary key. Rejected.")
             return False, Message.INTERNAL_ERROR
 
         if check_if_have_registered(username):
             redis_client.set("auth:request_status:%s" % request_id, Message.INTERNAL_ERROR, ex=86400)
-            logger.info("In handle request   Account: %s repeat registration" % username)
+            logger.warn("User try to register for a second time. Rejected." % username)
             return False, Message.INTERNAL_ERROR
 
         # 判断该用户是否为中南大学学生
@@ -76,19 +76,19 @@ class RedisQueue(object):
         """
 
         if check_if_request_id_exist(request_id):
-            logger.warning("In handle request   Account: %s request_id as primary key reuses" % username)
+            logger.warning("request_id reuses as primary key. Rejected.")
             return False, Message.INTERNAL_ERROR
 
         if check_if_have_registered(username):
             redis_client.set("auth:request_status:%s" % request_id, Message.INTERNAL_ERROR, ex=86400)
-            logger.info("In handle request   Account: %s repeat registration" % username)
+            logger.warn("User try to register for a second time. Rejected." % username)
             return False, Message.INTERNAL_ERROR
 
         email = username + "@csu.edu.cn"
         token = str(uuid.uuid1())
         send_email(email, token)
+
         redis_client.set("auth:request_status:%s" % request_id, Message.SEND_EMAIL_SUCCESS, ex=86400)
         request_info = "%s:%s" % (request_id, username)
         redis_client.set("auth:email_token:%s" % token, request_info, ex=86400)
-        logger.debug("auth:email_token:%s" % token)
         return True, Message.SUCCESS
