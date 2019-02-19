@@ -6,7 +6,7 @@ from everyclass.auth.messages import Message
 from everyclass.auth.queue import RedisQueue, redis_client
 from everyclass.auth.utils import json_payload
 
-user_blueprint = Blueprint('user', __name__, url_prefix='/user')
+user_blueprint = Blueprint('user', __name__, url_prefix='/')
 
 
 @user_blueprint.route('/register_by_password', methods=['POST'])
