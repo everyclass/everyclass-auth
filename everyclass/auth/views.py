@@ -64,7 +64,7 @@ def register_by_email():
     return jsonify({"acknowledged": True})
 
 
-@user_blueprint.route('/verify_email_token', methods=['GET'])
+@user_blueprint.route('/verify_email_token', methods=['POST'])
 @json_payload('email_token', supposed_type=str)
 def verify_email_token():
     """
