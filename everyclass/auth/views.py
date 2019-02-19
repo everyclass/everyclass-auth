@@ -110,7 +110,6 @@ def get_result():
     request_id = str(request.json.get('request_id'))
 
     message = redis_client.get("auth:request_status:" + request_id)
-    logger.debug(message)
 
     if not message:
         logger.info('request_id {} not found when querying'.format(request_id))

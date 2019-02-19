@@ -35,6 +35,7 @@ try:
     def init_db():
         """init database connection"""
         global __app
+        logger.info("Connecting to MongoDB...")
         init_pool(__app)
 
 
@@ -45,6 +46,8 @@ try:
         from elasticapm.contrib.flask import ElasticAPM
 
         global __app, __sentry_available
+
+        logger.info("Init log handlers...")
 
         # Sentry
         if __app.config['CONFIG_NAME'] in __app.config['SENTRY_AVAILABLE_IN']:
@@ -69,12 +72,16 @@ try:
                                                filter=lambda r, h: r.level >= 11)  # do not send DEBUG
             logger.handlers.append(logstash_handler)
             logger.info('You are in {} mode, so LogstashHandler is inited.'.format(__app.config['CONFIG_NAME']))
+
+    @uwsgidecorators.postfork
+    def init_queue_worker():
+        """spawn queue worker thread for each queue"""
+        threading.Thread(target=queue_worker).start()
 except ModuleNotFoundError:
     pass
 
 
 def create_app(offline=False):
-    logger.debug('call create_app')
     from everyclass.auth.util.logbook_logstash.handler import LogstashHandler
     from everyclass.auth.util.logbook_logstash.formatter import LOG_FORMAT_STRING
 
@@ -144,10 +151,6 @@ def create_app(offline=False):
 
     global __app
     __app = app
-
-    # 开一个新线程来运行队列函数
-    # todo: 通过配置文件定义线程数
-    threading.Thread(target=queue_worker).start()
 
     return app
 

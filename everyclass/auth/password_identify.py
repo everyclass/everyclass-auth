@@ -64,7 +64,6 @@ def simulate_login_noidentifying(username: str, password: str):
         if len(prompt) > 0:
             # 出现密码错误的提示
             if prompt[0].text == '用户名或密码错误':
-                logger.debug('password wrong')
                 return False, Message.PASSWORD_WRONG
             # 出现其他提示
             else:
