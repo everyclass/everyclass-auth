@@ -5,7 +5,6 @@ import sys
 import threading
 
 import logbook
-from elasticapm.contrib.flask import ElasticAPM
 from flask import Flask
 from raven.contrib.flask import Sentry
 from raven.handlers.logbook import SentryHandler
@@ -81,7 +80,7 @@ except ModuleNotFoundError:
     pass
 
 
-def create_app(offline=False):
+def create_app():
     from everyclass.auth.util.logbook_logstash.handler import LogstashHandler
     from everyclass.auth.util.logbook_logstash.formatter import LOG_FORMAT_STRING
 
@@ -117,7 +116,11 @@ def create_app(offline=False):
     - stack 默认是 False
 
     """
-    stdout_handler = logbook.StreamHandler(stream=sys.stdout, bubble=True, filter=lambda r, h: r.level < 13)
+    if app.config['CONFIG_NAME'] in app.config['DEBUG_LOG_AVAILABLE_IN']:
+        stdout_handler = logbook.StreamHandler(stream=sys.stdout, bubble=True, filter=lambda r, h: r.level < 13)
+    else:
+        # ignore debug when not in debug
+        stdout_handler = logbook.StreamHandler(stream=sys.stdout, bubble=True, filter=lambda r, h: 10 < r.level < 13)
     stdout_handler.format_string = LOG_FORMAT_STRING
     logger.handlers.append(stdout_handler)
 
@@ -125,29 +128,12 @@ def create_app(offline=False):
     stderr_handler.format_string = LOG_FORMAT_STRING
     logger.handlers.append(stderr_handler)
 
-    if not offline and (app.config['CONFIG_NAME'] in ["production", "staging", "testing"]):
-        # Sentry
-        sentry.init_app(app=app)
-        sentry_handler = SentryHandler(sentry.client, level='WARNING')  # Sentry 只处理 WARNING 以上的
-        logger.handlers.append(sentry_handler)
-
-        # Elastic APM
-        ElasticAPM(app)
-        # Log to Logstash
-        logstash_handler = LogstashHandler(host=app.config['LOGSTASH']['HOST'],
-                                           port=app.config['LOGSTASH']['PORT'],
-                                           release=app.config['GIT_DESCRIBE'],
-                                           logger=logger)
-        logger.handlers.append(logstash_handler)
-
     from everyclass.auth.views import user_blueprint
     app.register_blueprint(user_blueprint)
 
     # 初始化数据库
     if app.config['CONFIG_NAME'] == 'development':
         init_pool(app)
-
-    logger.info('App created with `{0}` config'.format(app.config['CONFIG_NAME']))
 
     global __app
     __app = app
