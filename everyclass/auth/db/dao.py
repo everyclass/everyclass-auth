@@ -1,27 +1,4 @@
-import pymysql
-from DBUtils.PooledDB import PooledDB
-from flask import current_app as app
-
-
-def init_pool(current_app):
-    """创建连接池，保存在 app 的 mysql_pool 对象中"""
-
-    # current_app.mysql_pool = PooledDB.ConnectionPool(**current_app.config.MYSQL_CONFIG)
-    current_app.mysql_pool = PooledDB(creator=pymysql,
-                                      mincached=1,
-                                      maxcached=5,
-                                      maxconnections=100,
-                                      host=current_app.config['MYSQL_CONFIG']['HOST'],
-                                      user=current_app.config['MYSQL_CONFIG']['USER'],
-                                      passwd=current_app.config['MYSQL_CONFIG']['PASSWORD'],
-                                      db=current_app.config['MYSQL_CONFIG']['DB'],
-                                      port=current_app.config['MYSQL_CONFIG']['PORT'],
-                                      charset=current_app.config['MYSQL_CONFIG']['CHARSET'])
-
-
-def get_connection():
-    """在连接池中获得连接"""
-    return app.mysql_pool.connection()
+from everyclass.auth.db.mongodb import get_connection
 
 
 def check_if_have_registered(username):

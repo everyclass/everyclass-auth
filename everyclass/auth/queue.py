@@ -1,7 +1,7 @@
 import uuid
 
 from everyclass.auth import logger
-from everyclass.auth.db.mysql import check_if_have_registered, check_if_request_id_exist, insert_browser_account
+from everyclass.auth.db.dao import check_if_have_registered, check_if_request_id_exist, insert_browser_account
 from everyclass.auth.db.redis import redis_client
 from everyclass.auth.email_identify import send_email
 from everyclass.auth.messages import Message

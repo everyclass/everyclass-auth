@@ -10,7 +10,7 @@ from flask import Flask
 from raven.contrib.flask import Sentry
 from raven.handlers.logbook import SentryHandler
 
-from everyclass.auth.db.mysql import init_pool
+from everyclass.auth.db.mongodb import init_pool
 
 logger = logbook.Logger(__name__)
 sentry = Sentry()
