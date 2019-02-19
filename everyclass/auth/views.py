@@ -112,7 +112,7 @@ def get_result():
     message = redis_client.get("auth:request_status:" + request_id)
 
     if not message:
-        logger.info('request_id {} not found when querying'.format(request_id))
+        logger.info('Try to query status for a non-exist request_id: {}'.format(request_id))
         return jsonify({
             'success': False,
             'message': Message.INVALID_REQUEST_ID
