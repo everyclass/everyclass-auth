@@ -8,16 +8,12 @@ class Config(object):
     DEBUG = False
     SECRET_KEY = 'development_key'
 
-    MYSQL_CONFIG = {
-        'USER'       : 'root',
-        'PASSWORD'   : 'root',
-        'HOST'       : 'localhost',
-        'PORT'       : 3306,
-        'DB'         : 'everyclass_login',
-        'USE_UNICODE': True,
-        'CHARSET'    : 'utf8mb4'
+    MONGO = {
+        'host'              : 'mongodb',
+        'port'              : 12306,
+        'uuidRepresentation': 'standard'
     }
-
+    MONGO_DB = 'everyclass_auth'
     REDIS_CONFIG = {
         'host': '127.0.0.1',
         'port': 6379,
