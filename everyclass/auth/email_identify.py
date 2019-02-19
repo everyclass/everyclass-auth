@@ -33,7 +33,7 @@ def send_email(email, token):
 
     file = open('everyclass/auth/static/everyclass_email.html', 'r', encoding='utf-8')
     original_text = file.read()
-    text = original_text.format(server_base=config.SERVER_BASE_URL, token=token)
+    text = original_text.format(config.SERVER_BASE_URL, token)
     file.close()
 
     message_alternative.attach(MIMEText(text, 'html', 'utf-8'))
