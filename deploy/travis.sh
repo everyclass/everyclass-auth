@@ -15,7 +15,7 @@ else
     curl -sL https://sentry.io/get-cli/ | bash
     export SENTRY_ORG=admirable
     export SENTRY_URL=https://sentry.admirable.pro/
-    sentry-cli releases new -p everyclass-api-server --finalize "$VERSION"
+    sentry-cli releases new -p everyclass-auth --finalize "$VERSION"
     sentry-cli releases set-commits "$VERSION" --auto
 
     # build Docker image and upload to hub
