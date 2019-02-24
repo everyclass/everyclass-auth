@@ -46,8 +46,7 @@ class RedisQueue(object):
 
         if check_if_have_registered(username):
             redis_client.set("auth:request_status:%s" % request_id, Message.INTERNAL_ERROR, ex=86400)
-            logger.warn("User try to register for a second time. Rejected." % username)
-            return False, Message.INTERNAL_ERROR
+            logger.warn("User {} try to register for a second time." % username)
 
         # 判断该用户是否为中南大学学生
         # result数组第一个参数为bool类型判断验证是否成功，第二个参数为出错原因
@@ -81,8 +80,7 @@ class RedisQueue(object):
 
         if check_if_have_registered(username):
             redis_client.set("auth:request_status:%s" % request_id, Message.INTERNAL_ERROR, ex=86400)
-            logger.warn("User try to register for a second time. Rejected." % username)
-            return False, Message.INTERNAL_ERROR
+            logger.warn("User %s try to register for a second time. " % username)
 
         email = username + "@csu.edu.cn"
         token = str(uuid.uuid1())
