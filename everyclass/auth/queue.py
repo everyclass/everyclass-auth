@@ -45,7 +45,6 @@ class RedisQueue(object):
             return False, Message.INTERNAL_ERROR
 
         if check_if_have_registered(username):
-            redis_client.set("auth:request_status:%s" % request_id, Message.INTERNAL_ERROR, ex=86400)
             logger.warn("User %s try to register for a second time." % username)
 
         # 判断该用户是否为中南大学学生
@@ -79,7 +78,6 @@ class RedisQueue(object):
             return False, Message.INTERNAL_ERROR
 
         if check_if_have_registered(username):
-            redis_client.set("auth:request_status:%s" % request_id, Message.INTERNAL_ERROR, ex=86400)
             logger.warn("User %s try to register for a second time. " % username)
 
         email = username + "@csu.edu.cn"
