@@ -4,3 +4,4 @@ everyclass/auth/pic
 everyclass/auth/test
 everyclass-auth/server.py
 **/__pycache__/
+deploy/uwsgi-local.ini
