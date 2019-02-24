@@ -1,6 +1,7 @@
 import gc
 import json
 import re
+import copy
 import sys
 import threading
 
@@ -14,6 +15,7 @@ from everyclass.auth.db.mongodb import init_pool
 logger = logbook.Logger(__name__)
 sentry = Sentry()
 __app = None
+__first_spawn = True
 
 try:
     import uwsgidecorators
@@ -31,13 +33,16 @@ try:
 
     @uwsgidecorators.postfork
     def init_log_handlers():
-        """init log handlers"""
+        """init log handlers and print current configuration to log"""
         from everyclass.auth.util.logbook_logstash.handler import LogstashHandler
         from elasticapm.contrib.flask import ElasticAPM
 
-        global __app, __sentry_available
+        global __app, __first_spawn
 
-        logger.info("Init log handlers...")
+        # Elastic APM
+        if __app.config['CONFIG_NAME'] in __app.config['APM_AVAILABLE_IN']:
+            ElasticAPM(__app)
+            logger.info('APM is inited because you are in {} mode.'.format(__app.config['CONFIG_NAME']))
 
         # Logstash centralized log
         if __app.config['CONFIG_NAME'] in __app.config['LOGSTASH_AVAILABLE_IN']:
@@ -48,18 +53,39 @@ try:
                                                logger=logger,
                                                filter=lambda r, h: r.level >= 11)  # do not send DEBUG
             logger.handlers.append(logstash_handler)
-            logger.info('You are in {} mode, so LogstashHandler is inited.'.format(__app.config['CONFIG_NAME']))
+            logger.info('LogstashHandler is inited because you are in {} mode.'.format(__app.config['CONFIG_NAME']))
+
         # Sentry
         if __app.config['CONFIG_NAME'] in __app.config['SENTRY_AVAILABLE_IN']:
             sentry.init_app(app=__app)
             sentry_handler = SentryHandler(sentry.client, level='WARNING')  # Sentry 只处理 WARNING 以上的
             logger.handlers.append(sentry_handler)
-            __sentry_available = True
-            logger.info('You are in {} mode, so Sentry is inited.'.format(__app.config['CONFIG_NAME']))
-        # Elastic APM
-        if __app.config['CONFIG_NAME'] in __app.config['APM_AVAILABLE_IN']:
-            ElasticAPM(__app)
-            logger.info('You are in {} mode, so APM is inited.'.format(__app.config['CONFIG_NAME']))
+            logger.info('Sentry is inited because you are in {} mode.'.format(__app.config['CONFIG_NAME']))
+
+        # print current configuration
+        import uwsgi
+        if uwsgi.worker_id() == 1 and __first_spawn:
+            # set to warning level because we want to monitor restarts
+            logger.warning('App (re)started in `{}` environment'.format(__app.config['CONFIG_NAME']), stack=False)
+
+            logger.info('Below are configurations we are using:')
+            logger.info('================================================================')
+            for key, value in __app.config.items():
+                if key not in ('SECRET_KEY',):
+                    value = copy.copy(value)
+
+                    # 敏感内容抹去
+                    if key == 'SENTRY_CONFIG':
+                        value['dsn'] = '[secret]'
+                    if key == 'ELASTIC_APM':
+                        value['SECRET_TOKEN'] = '[secret]'
+                    if key == 'EMAIL':
+                        value["PASSWORD"] = '[secret]'
+
+                    logger.info('{}: {}'.format(key, value))
+            logger.info('================================================================')
+
+            __first_spawn = False
 
     @uwsgidecorators.postfork
     def init_db():
