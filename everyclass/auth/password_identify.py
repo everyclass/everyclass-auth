@@ -5,11 +5,11 @@ from pytesseract import pytesseract
 from selenium import webdriver
 from selenium.common.exceptions import UnexpectedAlertPresentException
 
-from everyclass.auth.messages import Message
 from everyclass.auth import logger
+from everyclass.auth.messages import Message
 
 
-def simulate_login_noidentifying(username: str, password: str):
+def simulate_login_without_captcha(username: str, password: str):
     """
     浏览器模拟登陆,且不需要使用验证码读取，优先使用，更加快捷
     :param username: str
@@ -44,8 +44,7 @@ def simulate_login_noidentifying(username: str, password: str):
             login_button = driver.find_element_by_id('btnSubmit')  # 找到登录按钮
             login_button.click()  # 点击登录
         except Exception as e:
-            logger.warning("In simulated login  Account: %s "
-                           "in find element process throws an error：" % username + e.message)
+            logger.warning("in find element process throws an error：{} when simulating login as {}".format(username, e))
             return False, Message.INTERNAL_ERROR
 
         try:

@@ -5,7 +5,7 @@ from everyclass.auth.db.dao import check_if_have_registered, check_if_request_id
 from everyclass.auth.db.redis import redis_client
 from everyclass.auth.email_identify import send_email
 from everyclass.auth.messages import Message
-from everyclass.auth.password_identify import simulate_login_noidentifying
+from everyclass.auth.password_identify import simulate_login_without_captcha
 
 
 class RedisQueue(object):
@@ -50,7 +50,7 @@ class RedisQueue(object):
 
         # 判断该用户是否为中南大学学生
         # result数组第一个参数为bool类型判断验证是否成功，第二个参数为出错原因
-        success, cause = simulate_login_noidentifying(username, password)
+        success, cause = simulate_login_without_captcha(username, password)
 
         # 验证失败
         if not success:
