@@ -31,6 +31,7 @@ def register_by_password():
                     "username"  : username,
                     "password"  : password,
                     "method"    : "password"})
+    redis_client.set("auth:request_status:" + request_id, Message.WAITING)
 
     logger.info('New request: %s wants to verify by password' % username)
 
@@ -58,6 +59,7 @@ def register_by_email():
     user_queue.put({"request_id": request_id,
                     "username"  : username,
                     "method"    : "email"})
+    redis_client.set("auth:request_status:" + request_id, Message.WAITING)
 
     logger.info('New request: %s wants to verify by email' % username)
 
