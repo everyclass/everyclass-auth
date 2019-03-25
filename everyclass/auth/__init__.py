@@ -35,6 +35,7 @@ try:
     def init_log_handlers():
         """init log handlers and print current configuration to log"""
         from everyclass.auth.util.logbook_logstash.handler import LogstashHandler
+        from everyclass.auth.config import print_config
         from elasticapm.contrib.flask import ElasticAPM
 
         global __app, __first_spawn
@@ -67,23 +68,7 @@ try:
         if uwsgi.worker_id() == 1 and __first_spawn:
             # set to warning level because we want to monitor restarts
             logger.warning('App (re)started in `{}` environment'.format(__app.config['CONFIG_NAME']), stack=False)
-
-            logger.info('Below are configurations we are using:')
-            logger.info('================================================================')
-            for key, value in __app.config.items():
-                if key not in ('SECRET_KEY',):
-                    value = copy.copy(value)
-
-                    # 敏感内容抹去
-                    if key == 'SENTRY_CONFIG':
-                        value['dsn'] = '[secret]'
-                    if key == 'ELASTIC_APM':
-                        value['SECRET_TOKEN'] = '[secret]'
-                    if key == 'EMAIL':
-                        value["PASSWORD"] = '[secret]'
-
-                    logger.info('{}: {}'.format(key, value))
-            logger.info('================================================================')
+            print_config(__app, logger)
 
             __first_spawn = False
 

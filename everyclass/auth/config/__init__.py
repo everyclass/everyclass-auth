@@ -1,4 +1,5 @@
 import os
+import copy
 
 from everyclass.auth.config.default import Config as DefaultConfig
 
@@ -57,3 +58,20 @@ def get_config():
 
         _config_inited = True
         return MixedConfig
+
+
+def print_config(app, logger):
+    """print config in log"""
+    logger.info('Below are configurations we are using:')
+    logger.info('================================================================')
+    for key, value in app.config.items():
+        if key not in MixedConfig.PRODUCTION_SECURE_FIELDS:
+            if any(map(lambda t: isinstance(value, t), (dict,))):
+                value = copy.copy(value)
+                for k in value.keys():
+                    if "{}.{}".format(key, k) in MixedConfig.PRODUCTION_SECURE_FIELDS:
+                        value[k] = '[secret]'
+            logger.info('{}: {}'.format(key, value))
+        else:
+            logger.info("{}: [secret]".format(key))
+    logger.info('================================================================')

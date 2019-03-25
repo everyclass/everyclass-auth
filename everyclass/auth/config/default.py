@@ -56,12 +56,6 @@ class Config(object):
         'PORT': 8888
     }
 
-    # define available environments for logs, APM and error tracking
-    SENTRY_AVAILABLE_IN = ('production', 'staging', 'testing')
-    APM_AVAILABLE_IN = ('production', 'staging', 'testing')
-    LOGSTASH_AVAILABLE_IN = ('production', 'staging', 'testing')
-    DEBUG_LOG_AVAILABLE_IN = ('development',)
-
     """
     邮件SMTP服务相关设置
     """
@@ -74,3 +68,21 @@ class Config(object):
     }
 
     SERVER_BASE_URL = "https://everyclass.xyz"
+
+    # define available environments for logs, APM and error tracking
+    SENTRY_AVAILABLE_IN = ('production', 'staging', 'testing')
+    APM_AVAILABLE_IN = ('production', 'staging', 'testing')
+    LOGSTASH_AVAILABLE_IN = ('production', 'staging', 'testing')
+    DEBUG_LOG_AVAILABLE_IN = ('development',)
+
+    # fields that should be overwritten in production environment
+    PRODUCTION_OVERWRITE_FIELDS = ()
+
+    # fields that should not be in log
+    PRODUCTION_SECURE_FIELDS = ("SENTRY_CONFIG.dsn",
+                                "REDIS_CONFIG.password",
+                                "MONGO.password",
+                                "ELASTIC_APM.SECRET_TOKEN",
+                                "SECRET_KEY",
+                                "EMAIL.PASSWORD"
+                                )
