@@ -44,7 +44,7 @@ def simulate_login_without_captcha(username: str, password: str):
             login_button = driver.find_element_by_id('btnSubmit')  # 找到登录按钮
             login_button.click()  # 点击登录
         except Exception as e:
-            logger.warning("in find element process throws an error：{} when simulating login as {}".format(username, e))
+            logger.warning("{} when simulating login as {}".format(repr(e), username))
             return False, Message.INTERNAL_ERROR
 
         try:
@@ -52,7 +52,7 @@ def simulate_login_without_captcha(username: str, password: str):
         # 出现alert，一般是用户名或者密码为空或者是其他特殊情况
         except UnexpectedAlertPresentException:
             alert = driver.switch_to.alert
-            logger.warning("In simulated login  Account:" + username + " arises alert,text is \"" + alert.text + '\"')
+            logger.warning("Alert raised when logging as {}, text is {}".format(username, alert.text))
             return False, Message.INTERNAL_ERROR
 
         if driver.current_url == 'http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp':
@@ -66,12 +66,11 @@ def simulate_login_without_captcha(username: str, password: str):
                 return False, Message.PASSWORD_WRONG
             # 出现其他提示
             else:
-                logger.warning("In simulated login  Account: % s "
-                               "arises other red prompt,text is \"" % username + str(prompt[0].text) + '\"')
+                logger.warning("Red prompt raised when logging as {},text is {}".format(username, str(prompt[0].text)))
                 return False, Message.INTERNAL_ERROR
 
     # 验证码识别多次后仍然失败
-    logger.warning("In simulated login  Account: %s identifying too much times" % username)
+    logger.warning("Failed too much times for {}".format(username))
     return False, Message.INTERNAL_ERROR
 
 
