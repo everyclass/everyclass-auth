@@ -16,13 +16,12 @@ WORKDIR /var/app
 # - libssl-dev for installing Python package cryptography
 # - chromedriver for selenium
 RUN apt-get update \
-    && apt-get install -y procps wget gcc libpcre3-dev git libffi-dev libssl-dev chromedriver\
-    && pip install uwsgi
-
-# install google chrome
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && apt-get install -y --no-install-recommends procps wget gcc libpcre3-dev git libffi-dev libssl-dev chromedriver\
+    && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && apt install -y ./google-chrome-stable_current_amd64.deb \
-    && rm ./google-chrome-stable_current_amd64.deb
+    && rm ./google-chrome-stable_current_amd64.deb \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install uwsgi
 
 COPY . /var/app
 

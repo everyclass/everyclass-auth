@@ -31,33 +31,32 @@ def send_email(email, token):
     message_alternative = MIMEMultipart('alternative')
     message.attach(message_alternative)
 
-    file = open('everyclass/auth/static/everyclass_email.html', 'r', encoding='utf-8')
-    original_text = file.read()
-    text = original_text.format(config.SERVER_BASE_URL, token)
-    file.close()
+    with open('everyclass/auth/static/everyclass_email.html', 'r', encoding='utf-8') as email_html, open(
+            'everyclass/auth/static/everyclass_icon.png', 'rb') as logo_file:
+        original_text = email_html.read()
+        text = original_text.format(config.SERVER_BASE_URL, token)
+        email_html.close()
 
-    message_alternative.attach(MIMEText(text, 'html', 'utf-8'))
+        message_alternative.attach(MIMEText(text, 'html', 'utf-8'))
 
-    # 指定图片为当前目录
-    file2 = open('everyclass/auth/static/everyclass_icon.png', 'rb')
-    message_image = MIMEImage(file2.read())
-    file2.close()
+        # 指定图片为当前目录
+        message_image = MIMEImage(logo_file.read())
 
-    # 定义图片 ID，在 HTML 文本中引用
-    message_image.add_header('Content-ID', '<image1>')
-    message.attach(message_image)
+        # 定义图片 ID，在 HTML 文本中引用
+        message_image.add_header('Content-ID', '<image1>')
+        message.attach(message_image)
 
-    smtp_obj = smtplib.SMTP(host=config.EMAIL['HOST'], port=config.EMAIL['PORT'])
-    smtp_obj.connect(host=config.EMAIL['HOST'], port=config.EMAIL['PORT'])  # SMTP 端口号
+        smtp_obj = smtplib.SMTP(host=config.EMAIL['HOST'], port=config.EMAIL['PORT'])
+        smtp_obj.connect(host=config.EMAIL['HOST'], port=config.EMAIL['PORT'])  # SMTP 端口号
 
-    smtp_obj.ehlo()
-    smtp_obj.starttls()
+        smtp_obj.ehlo()
+        smtp_obj.starttls()
 
-    smtp_obj.login(config.EMAIL['USERNAME'], config.EMAIL['PASSWORD'])
-    smtp_obj.sendmail(sender, receivers, message.as_string())
-    smtp_obj.quit()
+        smtp_obj.login(config.EMAIL['USERNAME'], config.EMAIL['PASSWORD'])
+        smtp_obj.sendmail(sender, receivers, message.as_string())
+        smtp_obj.quit()
 
-    logger.info("Send email to user {} with token {}".format(email, token))
+        logger.info("Send email to user {} with token {}".format(email, token))
 
 
 def _format_address(email):
