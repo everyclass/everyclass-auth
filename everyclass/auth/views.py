@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from everyclass.auth import logger
 from everyclass.auth.db.dao import check_if_request_id_exist, insert_email_account
 from everyclass.auth.messages import Message
-from everyclass.auth.queue import RedisQueue, redis_client
+from everyclass.auth.queue import redis_client
 from everyclass.auth.utils import json_payload
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/')
@@ -26,18 +26,12 @@ def register_by_password():
     username = request.json.get('student_id')
     password = request.json.get('password')
 
-    logger.debug('ready to publish')
-    redis_client.publish('cctv', request_id)
-
-
-    #
-    # user_queue = RedisQueue()
-    # user_queue.put({"request_id": request_id,
-    #                 "username"  : username,
-    #                 "password"  : password,
-    #                 "method"    : "password"})
+    user_information = {"request_id": request_id,
+                        "username": username,
+                        "password": password,
+                        "method": "password"}
+    redis_client.publish('cctv', user_information)
     redis_client.set("auth:request_status:" + request_id, Message.WAITING)
-
     logger.info('New request: %s wants to verify by password' % username)
 
     return jsonify({"acknowledged": True})
@@ -60,10 +54,10 @@ def register_by_email():
     student_id = request.json.get("student_id")
     username = student_id
 
-    user_queue = RedisQueue()
-    user_queue.put({"request_id": request_id,
-                    "username"  : username,
-                    "method"    : "email"})
+    user_information = {"request_id": request_id,
+                        "username": username,
+                        "method": "email"}
+    redis_client.publish('cctv', user_information)
     redis_client.set("auth:request_status:" + request_id, Message.WAITING)
 
     logger.info('New request: %s wants to verify by email' % username)
