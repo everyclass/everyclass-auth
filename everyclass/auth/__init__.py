@@ -1,10 +1,10 @@
-import gc
+import datetime
 import json
 import re
-import copy
 import sys
 import threading
 
+import gc
 import logbook
 from flask import Flask
 from raven.contrib.flask import Sentry
@@ -15,30 +15,26 @@ from everyclass.auth.db.mongodb import init_pool
 logger = logbook.Logger(__name__)
 sentry = Sentry()
 __app = None
-__first_spawn = True
+__load_time = datetime.datetime.now()
 
 try:
     import uwsgidecorators
 
     """
-    below are functions that will be executed in **each** process after fork().
-    these functions will be executed in the same order of definition here.
+    使用 `uwsgidecorators.postfork` 装饰的函数会在 fork() 后的**每一个**子进程内被执行，执行顺序与这里的定义顺序一致
     """
-
 
     @uwsgidecorators.postfork
     def enable_gc():
-        """enable garbage collection"""
+        """重新启用垃圾回收"""
         gc.set_threshold(700)
 
     @uwsgidecorators.postfork
     def init_log_handlers():
-        """init log handlers and print current configuration to log"""
+        """初始化 log handlers 并将当前配置信息打 log"""
         from everyclass.auth.util.logbook_logstash.handler import LogstashHandler
         from everyclass.auth.config import print_config
         from elasticapm.contrib.flask import ElasticAPM
-
-        global __app, __first_spawn
 
         # Elastic APM
         if __app.config['CONFIG_NAME'] in __app.config['APM_AVAILABLE_IN']:
@@ -63,14 +59,14 @@ try:
             logger.handlers.append(sentry_handler)
             logger.info('Sentry is inited because you are in {} mode.'.format(__app.config['CONFIG_NAME']))
 
-        # print current configuration
+        # 如果当前时间与模块加载时间相差一分钟之内，认为是第一次 spawn（进程随着时间的推移可能会被 uwsgi 回收），
+        # 在 1 号 worker 里打印当前配置
         import uwsgi
-        if uwsgi.worker_id() == 1 and __first_spawn:
-            # set to warning level because we want to monitor restarts
-            logger.warning('App (re)started in `{}` environment'.format(__app.config['CONFIG_NAME']), stack=False)
-            print_config(__app, logger)
-
-            __first_spawn = False
+        if uwsgi.worker_id() == 1 and (datetime.datetime.now() - __load_time) < datetime.timedelta(minutes=1):
+            # 这里设置等级为 warning 因为我们希望在 sentry 里监控重启情况
+            logger.warning('App (re)started in `{0}` environment'
+                           .format(__app.config['CONFIG_NAME']), stack=False)
+            print_config(__app)
 
     @uwsgidecorators.postfork
     def init_db():
@@ -155,7 +151,7 @@ def queue_worker():
     并通过请求不同的验证方式调用不同的处理函数
     """
     logger.debug('Queue worker started')
-    global __app
+
     ctx = __app.app_context()
     ctx.push()
 
