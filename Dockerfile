@@ -20,8 +20,8 @@ WORKDIR /var/app
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends procps wget gcc libpcre3-dev git libffi-dev libssl-dev chromedriver\
-    && wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_72.0.3626.109-1_amd64.deb \
-    && apt install -y ./google-chrome-stable_current_amd64.deb \
+    && wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_72.0.3626.109-1_amd64.deb -O google-chrome-stable_amd64.deb \
+    && apt install -y ./google-chrome-stable_amd64.deb \
     && rm ./google-chrome-stable_current_amd64.deb \
     && pip install uwsgi
 
