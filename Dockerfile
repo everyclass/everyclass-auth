@@ -15,13 +15,14 @@ WORKDIR /var/app
 # - libffi-dev for installing Python package cffi
 # - libssl-dev for installing Python package cryptography
 # - chromedriver for selenium
+
+# See Google Chrome releases on https://www.ubuntuupdates.org/ppa/google_chrome?dist=stable
+
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends procps wget gcc libpcre3-dev git libffi-dev libssl-dev chromedriver gnupg\
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends google-chrome-stable=72.0.3626.109 \
-    && rm -rf /var/lib/apt/lists/* \
+    && apt-get install -y --no-install-recommends procps wget gcc libpcre3-dev git libffi-dev libssl-dev chromedriver\
+    && wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_72.0.3626.109-1_amd64.deb -O google-chrome-stable_amd64.deb \
+    && apt install -y ./google-chrome-stable_amd64.deb \
+    && rm ./google-chrome-stable_amd64.deb \
     && pip install uwsgi
 
 COPY . /var/app
