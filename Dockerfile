@@ -32,6 +32,8 @@ RUN pip3 install --upgrade pip \
     && pip3 install uwsgitop \
     && rm -r /root/.cache
 
+RUN echo "Asia/Shanghai" > /etc/timezone
+
 ENV UWSGI_HTTP_SOCKET ":80"
 
 CMD ["uwsgi", "--ini", "/var/app/deploy/uwsgi.ini"]
