@@ -23,52 +23,45 @@ def simulate_login_without_captcha(username: str, password: str):
 
     with contextlib.closing(webdriver.Chrome(chrome_options=options)) as driver:
         url = "http://csujwc.its.csu.edu.cn/jsxsd/view/xskb/queryglkb.jsp#"
-        identifying_time = 0
-        while identifying_time < 5:
-            identifying_time = identifying_time + 1
-            try:
-                driver.get(url)
-                name_input = driver.find_element_by_id("userAccount")  # 找到用户名的框框
-                pass_input = driver.find_element_by_id('userPassword')  # 找到输入密码的框框
-                name_input.clear()
-                name_input.send_keys(username)  # 填写用户名
-                time.sleep(0.2)
-                pass_input.clear()
-                pass_input.send_keys(password)  # 填写密码
-                time.sleep(0.3)
+        try:
+            driver.get(url)
+            name_input = driver.find_element_by_id("userAccount")  # 找到用户名的框框
+            pass_input = driver.find_element_by_id('userPassword')  # 找到输入密码的框框
+            name_input.clear()
+            name_input.send_keys(username)  # 填写用户名
+            time.sleep(0.2)
+            pass_input.clear()
+            pass_input.send_keys(password)  # 填写密码
+            time.sleep(0.3)
 
-                login_button = driver.find_element_by_id('btnSubmit')  # 找到登录按钮
-                login_button.click()  # 点击登录
-            except Exception as e:
-                logger.warning("{} when simulating login as {}".format(repr(e), username))
+            login_button = driver.find_element_by_id('btnSubmit')  # 找到登录按钮
+            login_button.click()  # 点击登录
+        except Exception as e:
+            logger.warning("{} when simulating login as {}".format(repr(e), username))
+            return False, Message.INTERNAL_ERROR
+
+        try:
+            driver.refresh()
+        # 出现alert，一般是用户名或者密码为空或者是其他特殊情况
+        except UnexpectedAlertPresentException:
+            alert = driver.switch_to.alert
+            logger.warning("Alert raised when logging as {}, text is {}".format(username, alert.text))
+            return False, Message.INTERNAL_ERROR
+
+        if driver.current_url == 'http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp':
+            return True, Message.SUCCESS
+
+        # 出现红色提示窗口
+        prompt = driver.find_elements_by_css_selector("font[color='red']")
+        if len(prompt) > 0:
+            # 出现密码错误的提示
+            if prompt[0].text == '用户名或密码错误':
+                return False, Message.PASSWORD_WRONG
+            # 出现其他提示
+            else:
+                logger.warning(
+                        "Red prompt raised when logging as {},text is {}".format(username, str(prompt[0].text)))
                 return False, Message.INTERNAL_ERROR
-
-            try:
-                driver.refresh()
-            # 出现alert，一般是用户名或者密码为空或者是其他特殊情况
-            except UnexpectedAlertPresentException:
-                alert = driver.switch_to.alert
-                logger.warning("Alert raised when logging as {}, text is {}".format(username, alert.text))
-                return False, Message.INTERNAL_ERROR
-
-            if driver.current_url == 'http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp':
-                return True, Message.SUCCESS
-
-            # 出现红色提示窗口
-            prompt = driver.find_elements_by_css_selector("font[color='red']")
-            if len(prompt) > 0:
-                # 出现密码错误的提示
-                if prompt[0].text == '用户名或密码错误':
-                    return False, Message.PASSWORD_WRONG
-                # 出现其他提示
-                else:
-                    logger.warning(
-                            "Red prompt raised when logging as {},text is {}".format(username, str(prompt[0].text)))
-                    return False, Message.INTERNAL_ERROR
-
-        # 验证码识别多次后仍然失败
-        logger.warning("Failed too much times for {}".format(username))
-        return False, Message.INTERNAL_ERROR
 
 
 def simulate_login(username: str, password: str):
