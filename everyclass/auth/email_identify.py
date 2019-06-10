@@ -56,7 +56,7 @@ def send_email(email, token):
         smtp_obj.sendmail(sender, receivers, message.as_string())
         smtp_obj.quit()
 
-        logger.info("Send email to user {} with token {}".format(email, token))
+        logger.info("Email sent to {} with token {}".format(email, token))
 
 
 def _format_address(email):
