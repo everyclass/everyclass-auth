@@ -40,7 +40,7 @@ class Config(object):
     """
     SENTRY_CONFIG = {
         'DSN'     : '',
-        'RELSEASE': '',
+        'RELEASE': '',
         'TAGS'    : {'environment': 'default'}
     }
     ELASTIC_APM = {
