@@ -23,12 +23,11 @@ def simulate_login_without_captcha(username: str, password: str):
 
     with contextlib.closing(webdriver.Chrome(chrome_options=options)) as driver:
         url = "http://csujwc.its.csu.edu.cn/jsxsd/view/xskb/queryglkb.jsp#"
-        driver.get(url)
         identifying_time = 0
         while identifying_time < 5:
             identifying_time = identifying_time + 1
-
             try:
+                driver.get(url)
                 name_input = driver.find_element_by_id("userAccount")  # 找到用户名的框框
                 pass_input = driver.find_element_by_id('userPassword')  # 找到输入密码的框框
                 name_input.clear()
