@@ -20,7 +20,7 @@ RUN apt-get update \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
     && apt-get update \
-    && apt-get install -y --no-install-recommends google-chrome-stable=72.0.3626.109 \
+    && apt-get install -y --no-install-recommends google-chrome-stable=72.0.3626.109-1 \
     && rm -rf /var/lib/apt/lists/* \
     && pip install uwsgi
 
