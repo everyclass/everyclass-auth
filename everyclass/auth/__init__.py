@@ -84,6 +84,7 @@ except ModuleNotFoundError:
 
 
 def create_app():
+    import queue
     from everyclass.auth.util.logbook_logstash.handler import LogstashHandler
     from everyclass.auth.util.logbook_logstash.formatter import LOG_FORMAT_STRING
 
@@ -140,8 +141,14 @@ def create_app():
 
     global __app
     __app = app
+    global request_queue
+    request_queue = queue.Queue()
 
     return app
+
+
+def get_request_queue():
+    return request_queue
 
 
 def queue_worker():
@@ -155,12 +162,13 @@ def queue_worker():
     ctx = __app.app_context()
     ctx.push()
 
-    from everyclass.auth.queue import handle_email_register_request, handle_browser_register_request
+    from everyclass.auth.handle_request import handle_email_register_request, handle_browser_register_request
     from everyclass.auth.db.redis import redis_client
 
-    sub = redis_client.pubsub()
-    sub.subscribe('cctv')
-    for item in sub.listen():
+    while True:
+        if request_queue.empty():
+            break
+        item = request_queue.put()
         if item['type'] == 'message':
             user_inf_str = bytes.decode(item['data'])
             user_inf_str = re.sub('\'', '\"', user_inf_str)
@@ -170,4 +178,6 @@ def queue_worker():
                 handle_browser_register_request(user_inf['request_id'], user_inf['username'], user_inf['password'])
             if user_inf['method'] == 'email':
                 handle_email_register_request(user_inf['request_id'], user_inf['username'])
+
+
 

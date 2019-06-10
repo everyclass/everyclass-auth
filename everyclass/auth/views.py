@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify, request
 
-from everyclass.auth import logger
+from everyclass.auth import logger, get_request_queue
 from everyclass.auth.db.dao import check_if_request_id_exist, insert_email_account
 from everyclass.auth.messages import Message
-from everyclass.auth.queue import redis_client
+from everyclass.auth.handle_request import redis_client
 from everyclass.auth.utils import json_payload
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/')
@@ -30,7 +30,8 @@ def register_by_password():
                         "username": username,
                         "password": password,
                         "method": "password"}
-    redis_client.publish('cctv', user_information)
+    request_queue = get_request_queue()
+    request_queue.put(user_information)
     redis_client.set("auth:request_status:" + request_id, Message.WAITING)
     logger.info('New request: %s wants to verify by password' % username)
 
@@ -57,7 +58,10 @@ def register_by_email():
     user_information = {"request_id": request_id,
                         "username": username,
                         "method": "email"}
-    redis_client.publish('cctv', user_information)
+
+    request_queue = get_request_queue()
+    request_queue.put(user_information)
+
     redis_client.set("auth:request_status:" + request_id, Message.WAITING)
 
     logger.info('New request: %s wants to verify by email' % username)
