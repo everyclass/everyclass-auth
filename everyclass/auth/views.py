@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request
 
-from everyclass.auth import logger, get_request_queue
+from everyclass.auth import logger
 from everyclass.auth.db.dao import check_if_request_id_exist, insert_email_account
 from everyclass.auth.messages import Message
 from everyclass.auth.handle_request import redis_client
 from everyclass.auth.utils import json_payload
+from everyclass.auth.handle_register_queue import RedisQueue
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/')
 
@@ -26,12 +27,13 @@ def register_by_password():
     username = request.json.get('student_id')
     password = request.json.get('password')
 
-    user_information = {"request_id": request_id,
-                        "username": username,
-                        "password": password,
-                        "method": "password"}
-    request_queue = get_request_queue()
-    request_queue.put(user_information)
+    user_queue = RedisQueue()
+    user_queue.put({"request_id": request_id,
+                    "username": username,
+                    "password": password,
+                    "method": "password"})
+    redis_client.set("auth:request_status:" + request_id, Message.WAITING)
+
     redis_client.set("auth:request_status:" + request_id, Message.WAITING)
     logger.info('New request: %s wants to verify by password' % username)
 
@@ -55,12 +57,10 @@ def register_by_email():
     student_id = request.json.get("student_id")
     username = student_id
 
-    user_information = {"request_id": request_id,
-                        "username": username,
-                        "method": "email"}
-
-    request_queue = get_request_queue()
-    request_queue.put(user_information)
+    user_queue = RedisQueue()
+    user_queue.put({"request_id": request_id,
+                    "username": username,
+                    "method": "email"})
 
     redis_client.set("auth:request_status:" + request_id, Message.WAITING)
 
