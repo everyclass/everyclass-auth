@@ -11,7 +11,6 @@ from raven.contrib.flask import Sentry
 from raven.handlers.logbook import SentryHandler
 
 from everyclass.auth.db.mongodb import init_pool
-from everyclass.auth.handle_request import handle_email_register_request, handle_browser_register_request
 
 logger = logbook.Logger(__name__)
 sentry = Sentry()
@@ -151,6 +150,7 @@ def queue_worker():
     如果为空则等待至有元素被加入队列
     并通过请求不同的验证方式调用不同的处理函数
     """
+    from everyclass.auth.handle_request import handle_email_register_request, handle_browser_register_request
     logger.debug('Queue worker started')
 
     ctx = __app.app_context()

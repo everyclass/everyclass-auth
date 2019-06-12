@@ -5,7 +5,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr, parseaddr
 
-from everyclass.auth import logger
 from everyclass.auth.config import get_config
 
 config = get_config()
@@ -17,7 +16,7 @@ def send_email(email, token):
     :param email: str,需要发送的邮箱账号
     :param token: str，需要给该邮箱账号发送的token
     """
-
+    from everyclass.auth import logger
     logger.info("Sending email to {}".format(email))
 
     sender = config.EMAIL['SENDER']

@@ -6,7 +6,6 @@ from pytesseract import pytesseract
 from selenium import webdriver
 from selenium.common.exceptions import UnexpectedAlertPresentException
 
-from everyclass.auth import logger
 from everyclass.auth.messages import Message
 
 
@@ -17,6 +16,7 @@ def simulate_login_without_captcha(username: str, password: str):
     :param password: str
     :return:
     """
+    from everyclass.auth import logger
     options = webdriver.ChromeOptions()  # 创建chrome参数对象
     options.add_argument('headless')  # 把chrome设置成无界面模式
     options.add_argument("--no-sandbox")
@@ -71,6 +71,7 @@ def simulate_login(username: str, password: str):
     :param password: str
     :return:
     """
+    from everyclass.auth import logger
     # 创建chrome参数对象
     options = webdriver.ChromeOptions()
     # 把chrome设置成无界面模式
