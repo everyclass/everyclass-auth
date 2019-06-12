@@ -45,7 +45,7 @@ def handle_email_register_request(request_id: str, username: str):
     :param request_id: str, 请求 ID
     :param username: str, 学号
     """
-
+    from everyclass.auth import logger
     if check_if_request_id_exist(request_id):
         logger.warning("request_id reuses as primary key. Rejected.")
         return False, Message.INTERNAL_ERROR
