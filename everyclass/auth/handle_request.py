@@ -1,6 +1,5 @@
 import uuid
 
-from everyclass.auth import logger
 from everyclass.auth.db.dao import check_if_have_registered, check_if_request_id_exist, insert_browser_account
 from everyclass.auth.db.redis import redis_client
 from everyclass.auth.email_identify import send_email
@@ -13,6 +12,7 @@ def handle_browser_register_request(request_id: str, username: str, password: st
     处理redis队列中的通过浏览器验证的请求
 
     """
+    from everyclass.auth import logger
     if check_if_request_id_exist(request_id):
         logger.warning("request_id reuses as primary key. Rejected.")
         return False, Message.INTERNAL_ERROR
