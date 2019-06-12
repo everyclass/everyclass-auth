@@ -27,13 +27,11 @@ def register_by_password():
     username = request.json.get('student_id')
     password = request.json.get('password')
 
-    user_queue = RedisQueue()
+    user_queue = RedisQueue('everyclass')
     user_queue.put({"request_id": request_id,
                     "username": username,
                     "password": password,
                     "method": "password"})
-    redis_client.set("auth:request_status:" + request_id, Message.WAITING)
-
     redis_client.set("auth:request_status:" + request_id, Message.WAITING)
     logger.info('New request: %s wants to verify by password' % username)
 
@@ -57,7 +55,7 @@ def register_by_email():
     student_id = request.json.get("student_id")
     username = student_id
 
-    user_queue = RedisQueue()
+    user_queue = RedisQueue("everyclass")
     user_queue.put({"request_id": request_id,
                     "username": username,
                     "method": "email"})

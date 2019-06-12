@@ -11,6 +11,7 @@ from raven.contrib.flask import Sentry
 from raven.handlers.logbook import SentryHandler
 
 from everyclass.auth.db.mongodb import init_pool
+from everyclass.auth.handle_request import handle_email_register_request, handle_browser_register_request
 
 logger = logbook.Logger(__name__)
 sentry = Sentry()
@@ -84,7 +85,6 @@ except ModuleNotFoundError:
 
 
 def create_app():
-    import queue
     from everyclass.auth.util.logbook_logstash.handler import LogstashHandler
     from everyclass.auth.util.logbook_logstash.formatter import LOG_FORMAT_STRING
 
@@ -141,14 +141,8 @@ def create_app():
 
     global __app
     __app = app
-    global request_queue
-    request_queue = queue.Queue()
 
     return app
-
-
-def get_request_queue():
-    return request_queue
 
 
 def queue_worker():
@@ -165,7 +159,7 @@ def queue_worker():
     from everyclass.auth.handle_register_queue import RedisQueue
     from everyclass.auth.db.redis import redis_client
 
-    user_queue = RedisQueue()
+    user_queue = RedisQueue("everyclass")
     while True:
         result = user_queue.get_wait()[1]  # 队列返回的第一个参数为频道名，第二个参数为存入的值
         if not result:
@@ -174,11 +168,9 @@ def queue_worker():
         request_info = re.sub('\'', '\"', request_info)
         request_info = json.loads(request_info)
         if request_info['method'] == 'password':
-            user_queue.handle_browser_register_request(request_info['request_id'],
-                                                       request_info['username'],
-                                                       request_info['password'])
+            handle_browser_register_request(request_info['request_id'],
+                                            request_info['username'],
+                                            request_info['password'])
         if request_info['method'] == 'email':
-            user_queue.handle_email_register_request(request_info['request_id'],
-                                                     request_info['username'])
-
-
+            handle_email_register_request(request_info['request_id'],
+                                          request_info['username'])

@@ -1,9 +1,4 @@
-import json
-import re
-import time
-
 from everyclass.auth.db.redis import redis_client
-from everyclass.auth.handle_request import handle_email_register_request, handle_browser_register_request
 
 
 class RedisQueue(object):
@@ -30,30 +25,3 @@ class RedisQueue(object):
         # 直接返回队列第一个元素，如果队列为空返回的是None
         item = self.__db.lpop(self.key)
         return item
-
-
-def start_register_queue():
-    """
-    启动用于缓存用户请求的队列
-    如果为空则等待至有元素被加入队列
-    并通过请求不同的验证方式调用不同的处理函数
-    """
-    user_queue = RedisQueue('everyclass')
-    while True:
-        print('p1 start')
-        # 队列返回的第一个参数为频道名，第二个参数为存入的值
-        result = user_queue.get_wait()[1]
-        print(result)
-        if not result:
-            continue
-        user_inf_str = bytes.decode(result)
-        user_inf_str = re.sub('\'', '\"', user_inf_str)
-        user_inf = json.loads(user_inf_str)
-
-        if user_inf['method'] == 'browser':
-            handle_browser_register_request(user_inf['request_id'], user_inf['username'], user_inf['password'])
-
-        if user_inf['method'] == 'email':
-            handle_email_register_request(user_inf['request_id'], user_inf['username'])
-
-        time.sleep(2)
