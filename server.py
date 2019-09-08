@@ -1,6 +1,9 @@
 import gc
 
 from everyclass.auth import create_app
+from everyclass.common import trace
+
+trace.patch()
 
 app = create_app()
 gc.set_threshold(0)

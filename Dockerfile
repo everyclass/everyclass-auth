@@ -4,6 +4,7 @@ ENV REFRESHED_AT 20181218
 ENV MODE PRODUCTION
 ENV FLASK_ENV production
 ENV PIPENV_VENV_IN_PROJECT 1
+ENV DATADOG_SERVICE_NAME=everyclass-auth DD_TRACE_ANALYTICS_ENABLED=true DD_LOGS_INJECTION=true
 
 WORKDIR /var/app
 
@@ -38,4 +39,4 @@ RUN echo "Asia/Shanghai" > /etc/timezone
 
 ENV UWSGI_HTTP_SOCKET ":80"
 
-CMD ["uwsgi", "--ini", "/var/app/deploy/uwsgi.ini"]
+CMD ["/var/app/.venv/bin/ddtrace-run", "uwsgi", "--ini", "/var/app/deploy/uwsgi.ini"]
