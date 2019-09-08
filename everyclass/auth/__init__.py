@@ -7,7 +7,7 @@ import gc
 
 from flask import Flask
 from raven.contrib.flask import Sentry
-from raven.handlers.logbook import SentryHandler
+from raven.handlers.logging import SentryHandler
 
 from everyclass.auth.db.mongodb import init_pool
 
@@ -31,16 +31,16 @@ try:
 
 
     @uwsgidecorators.postfork
-    def init_log_handlers():
+    def init_plugins():
         """初始化 log handlers 并将当前配置信息打 log"""
         from everyclass.auth.config import print_config
 
         # Sentry
         if __app.config['CONFIG_NAME'] in __app.config['SENTRY_AVAILABLE_IN']:
             sentry.init_app(app=__app)
-            sentry_handler = SentryHandler(sentry.client, level='WARNING')  # Sentry 只处理 WARNING 以上的
-            logger.handlers.append(sentry_handler)
-            logger.info('Sentry is inited because you are in {} mode.'.format(__app.config['CONFIG_NAME']))
+            sentry_handler = SentryHandler(sentry.client)
+            sentry_handler.setLevel(logging.WARNING)
+            logging.getLogger().addHandler(sentry_handler)
 
         # 如果当前时间与模块加载时间相差一分钟之内，认为是第一次 spawn（进程随着时间的推移可能会被 uwsgi 回收），
         # 在 1 号 worker 里打印当前配置
