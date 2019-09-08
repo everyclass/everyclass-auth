@@ -43,18 +43,6 @@ class Config(object):
         'RELEASE': '',
         'TAGS'    : {'environment': 'default'}
     }
-    ELASTIC_APM = {
-        'SERVICE_NAME'   : 'everyclass-auth_server',
-        'SECRET_TOKEN'   : 'token',
-        'SERVER_URL'     : 'http://127.0.0.1:8200',
-        # https://www.elastic.co/guide/en/apm/agent/python/2.x/configuration.html#config-auto-log-stacks
-        'AUTO_LOG_STACKS': False,
-        'SERVICE_VERSION': GIT_DESCRIBE
-    }
-    LOGSTASH = {
-        'HOST': '127.0.0.1',
-        'PORT': 8888
-    }
 
     """
     邮件SMTP服务相关设置
@@ -71,9 +59,6 @@ class Config(object):
 
     # define available environments for logs, APM and error tracking
     SENTRY_AVAILABLE_IN = ('production', 'staging', 'testing')
-    APM_AVAILABLE_IN = ('production', 'staging', 'testing')
-    LOGSTASH_AVAILABLE_IN = ('production', 'staging', 'testing')
-    DEBUG_LOG_AVAILABLE_IN = ('development',)
 
     # fields that should be overwritten in production environment
     PRODUCTION_OVERWRITE_FIELDS = ()
@@ -82,7 +67,6 @@ class Config(object):
     PRODUCTION_SECURE_FIELDS = ("SENTRY_CONFIG.dsn",
                                 "REDIS_CONFIG.password",
                                 "MONGO.password",
-                                "ELASTIC_APM.SECRET_TOKEN",
                                 "SECRET_KEY",
                                 "EMAIL.PASSWORD"
                                 )
