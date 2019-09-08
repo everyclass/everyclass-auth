@@ -1,3 +1,0 @@
-[submodule "everyclass/utils/logbook_logstash"]
-	path = everyclass/auth/util/logbook_logstash
-	url = https://github.com/fr0der1c/logbook_logstash.git
