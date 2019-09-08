@@ -14,7 +14,6 @@ from everyclass.auth.db.mongodb import init_pool
 logger = logging.getLogger(__name__)
 sentry = Sentry()
 __app = None
-__load_time = datetime.datetime.now()
 
 try:
     import uwsgidecorators
@@ -32,8 +31,8 @@ try:
 
     @uwsgidecorators.postfork
     def init_plugins():
-        """初始化 log handlers 并将当前配置信息打 log"""
-        from everyclass.auth.config import print_config
+        """初始化日志、错误追踪插件，并将当前配置信息打 log"""
+        from everyclass.common.flask import print_config
 
         # Sentry
         if __app.config['CONFIG_NAME'] in __app.config['SENTRY_AVAILABLE_IN']:
@@ -42,13 +41,9 @@ try:
             sentry_handler.setLevel(logging.WARNING)
             logging.getLogger().addHandler(sentry_handler)
 
-        # 如果当前时间与模块加载时间相差一分钟之内，认为是第一次 spawn（进程随着时间的推移可能会被 uwsgi 回收），
-        # 在 1 号 worker 里打印当前配置
-        import uwsgi
-        if uwsgi.worker_id() == 1 and (datetime.datetime.now() - __load_time) < datetime.timedelta(minutes=1):
-            # 这里设置等级为 warning 因为我们希望在 sentry 里监控重启情况
-            logger.warning('App (re)started in `{0}` environment'.format(__app.config['CONFIG_NAME']))
-            print_config(__app)
+            logger.info('Sentry is inited because you are in {} mode.'.format(__app.config['CONFIG_NAME']))
+
+        print_config(__app, logger)
 
 
     @uwsgidecorators.postfork
