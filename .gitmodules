@@ -1,0 +1,4 @@
+[submodule "everyclass-common"]
+	path = everyclass/common
+	url = https://github.com/everyclass/everyclass-common
+	branch = master
