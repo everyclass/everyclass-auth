@@ -14,7 +14,7 @@ blinker = "*"
 uwsgidecorators = "*"
 gevent = "*"
 ddtrace = "*"
-psycopg2 = "*"
+psycopg2-binary = "~=2.0"
 
 [dev-packages]
 coverage = "==4.4.2"
