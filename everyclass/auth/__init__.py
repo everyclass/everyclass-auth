@@ -9,7 +9,7 @@ from flask import Flask
 from raven.contrib.flask import Sentry
 from raven.handlers.logging import SentryHandler
 
-from everyclass.auth.db.mongodb import init_pool
+from everyclass.auth.db.postgres import init_pool
 
 logger = logging.getLogger(__name__)
 sentry = Sentry()
@@ -51,7 +51,7 @@ try:
         """init database connection"""
         global __app
         logger.info("Connecting to MongoDB...")
-        init_pool(__app)
+        init_pool()
 
 
     @uwsgidecorators.postfork
@@ -81,7 +81,7 @@ def create_app():
 
     # 初始化数据库
     if app.config['CONFIG_NAME'] == 'development':
-        init_pool(app)
+        init_pool()
 
     global __app
     __app = app
