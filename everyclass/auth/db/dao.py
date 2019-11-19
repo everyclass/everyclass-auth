@@ -28,7 +28,7 @@ def insert_browser_account(request_id, username):
     """插入一个用户信息"""
     with conn_context() as conn, conn.cursor() as cursor:
         insert_query = """
-        INSERT INTO account (request_id, username, method) VALUES (%s,%s,%s,%s)
+        INSERT INTO account (request_id, username, method) VALUES (%s,%s,%s)
         """
         cursor.execute(insert_query, (uuid.UUID(request_id), username, "browser"))
         conn.commit()
@@ -40,6 +40,6 @@ def check_if_request_id_exist(request_id):
         select_query = "SELECT request_id FROM account WHERE request_id=%s"
         cursor.execute(select_query, (uuid.UUID(request_id),))
         result = cursor.fetchone()
-    if result[0]:
+    if result:
         return True
     return False
