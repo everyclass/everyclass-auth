@@ -33,7 +33,7 @@ def handle_browser_register_request(request_id: str, username: str, password: st
     # 经判断是中南大学学生，生成token，并将相应数据持久化
     redis_client.set("auth:request_status:%s" % request_id, Message.IDENTIFYING_SUCCESS, ex=86400)  # 1 day
     logger.info('User %s password verification success.' % username)
-    insert_browser_account(request_id, username, 'browser')
+    insert_browser_account(request_id, username)
 
     return True, Message.SUCCESS
 

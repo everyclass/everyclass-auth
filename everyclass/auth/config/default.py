@@ -8,16 +8,19 @@ class Config(object):
     DEBUG = False
     SECRET_KEY = 'development_key'
 
-    MONGO = {
-        'host'              : 'mongodb',
-        'port'              : 12306,
-        'uuidRepresentation': 'standard'
-    }
-    MONGO_DB = 'everyclass_auth'
     REDIS_CONFIG = {
         'host': '127.0.0.1',
         'port': 6379,
         'db'  : 1
+    }
+
+    POSTGRES_SCHEMA = "everyclass_auth"
+    POSTGRES_CONNECTION = {
+        'dbname': 'everyclass',
+        'user': 'everyclass_auth',
+        'password': 'everyclass_auth',
+        'host': 'localhost',
+        'port': 5432
     }
 
     """

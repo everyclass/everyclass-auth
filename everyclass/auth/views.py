@@ -91,7 +91,7 @@ def verify_email_token():
     logger.info('User %s email verification success' % username)
 
     if not check_if_request_id_exist(request_id):
-        insert_email_account(request_id, username, 'email', email_token)
+        insert_email_account(request_id, username, email_token)
 
     redis_client.set("auth:request_status:%s" % request_id, Message.IDENTIFYING_SUCCESS, ex=86400)  # valid for 1 day
     return jsonify({

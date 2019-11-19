@@ -9,12 +9,12 @@ gitpython = ">=2.1.8"
 raven = ">=6.9.0"
 pytesseract = "*"
 redis = ">=2.10.0,<3.0"
-pymongo = "~=3.7"
 selenium = "*"
 blinker = "*"
 uwsgidecorators = "*"
 gevent = "*"
 ddtrace = "*"
+psycopg2 = "*"
 
 [dev-packages]
 coverage = "==4.4.2"
