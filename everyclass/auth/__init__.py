@@ -50,7 +50,7 @@ try:
     def init_db():
         """init database connection"""
         global __app
-        logger.info("Connecting to MongoDB...")
+        logger.info("Connecting to DB...")
         init_pool()
 
 
