@@ -18,9 +18,9 @@ def register_by_password():
 
     期望格式：
     {
-        "request_id":"1",
+        "request_id":"54e9a329-fac0-4df3-b747-e01fd5396581",
         "student_id": "3901160413",
-        "password": "",
+        "password": ""
     }
     """
     request_id = request.json.get('request_id')
@@ -46,7 +46,7 @@ def register_by_email():
 
     期望格式：
     {
-        "request_id": "123"
+        "request_id": "123",
         "student_id": "3901160413"
     }
     """
