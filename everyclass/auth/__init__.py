@@ -1,10 +1,9 @@
-import datetime
 import json
-import re
 import logging
+import re
 import threading
-import gc
 
+import gc
 from flask import Flask
 from raven.contrib.flask import Sentry
 from raven.handlers.logging import SentryHandler
@@ -95,13 +94,14 @@ def queue_worker():
     如果为空则等待至有元素被加入队列
     并通过请求不同的验证方式调用不同的处理函数
     """
-    from everyclass.auth.handle_request import handle_email_register_request, handle_browser_register_request
+    from everyclass.auth.password_verification import handle_browser_register_request
+    from everyclass.auth.email_verification import handle_email_register_request
     logger.debug('Queue worker started')
 
     ctx = __app.app_context()
     ctx.push()
 
-    from everyclass.auth.handle_register_queue import RedisQueue
+    from everyclass.auth.message_queue import RedisQueue
     from everyclass.auth.db.redis import redis_client
 
     user_queue = RedisQueue("everyclass")

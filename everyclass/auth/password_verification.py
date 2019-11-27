@@ -6,7 +6,9 @@ from pytesseract import pytesseract
 from selenium import webdriver
 from selenium.common.exceptions import UnexpectedAlertPresentException
 
-from everyclass.auth.messages import Message
+from everyclass.auth.consts import Message
+from everyclass.auth.db.dao import check_if_have_registered, check_if_request_id_exist, insert_browser_account
+from everyclass.auth.db.redis import redis_client
 
 
 def simulate_login_without_captcha(username: str, password: str):
@@ -154,3 +156,34 @@ def simulate_login(username: str, password: str):
     # 验证码识别多次后仍然失败
     logger.warning("In simulated login  Account: %s identifying too much times")
     return False, Message.INTERNAL_ERROR
+
+
+def handle_browser_register_request(request_id: str, username: str, password: str):
+    """
+    处理redis队列中的通过浏览器验证的请求
+
+    """
+    from everyclass.auth import logger
+    if check_if_request_id_exist(request_id):
+        logger.warning("request_id reuses as primary key. Rejected.")
+        return False, Message.INTERNAL_ERROR
+
+    if check_if_have_registered(username):
+        logger.warn("User %s try to register for a second time." % username)
+
+    # 判断该用户是否为中南大学学生
+    # result数组第一个参数为bool类型判断验证是否成功，第二个参数为出错原因
+    success, cause = simulate_login_without_captcha(username, password)
+
+    # 验证失败
+    if not success:
+        redis_client.set("auth:request_status:%s" % request_id, cause, ex=86400)
+        logger.info("User {} password verification failed({}).".format(username, cause))
+        return False, cause
+
+    # 经判断是中南大学学生，生成token，并将相应数据持久化
+    redis_client.set("auth:request_status:%s" % request_id, Message.IDENTIFYING_SUCCESS, ex=86400)  # 1 day
+    logger.info('User %s password verification success.' % username)
+    insert_browser_account(request_id, username)
+
+    return True, Message.SUCCESS

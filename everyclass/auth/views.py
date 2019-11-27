@@ -1,11 +1,11 @@
 from flask import Blueprint, jsonify, request
 
 from everyclass.auth import logger
+from everyclass.auth.consts import Message
 from everyclass.auth.db.dao import check_if_request_id_exist, insert_email_account
-from everyclass.auth.messages import Message
-from everyclass.auth.handle_request import redis_client
+from everyclass.auth.db.redis import redis_client
+from everyclass.auth.message_queue import RedisQueue
 from everyclass.auth.utils import json_payload
-from everyclass.auth.handle_register_queue import RedisQueue
 
 user_blueprint = Blueprint('user', __name__, url_prefix='/')
 

@@ -1,4 +1,5 @@
 import smtplib
+import uuid
 from email.header import Header
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
@@ -6,6 +7,9 @@ from email.mime.text import MIMEText
 from email.utils import formataddr, parseaddr
 
 from everyclass.auth.config import get_config
+from everyclass.auth.consts import Message
+from everyclass.auth.db.dao import check_if_have_registered, check_if_request_id_exist
+from everyclass.auth.db.redis import redis_client
 
 config = get_config()
 
@@ -62,3 +66,28 @@ def _format_address(email):
     """邮件地址的格式化"""
     name, address = parseaddr(email)
     return formataddr((Header(name, 'utf-8').encode(), address))
+
+
+def handle_email_register_request(request_id: str, username: str):
+    """
+    处理redis队列中的通过邮箱验证的请求
+
+    :param request_id: str, 请求 ID
+    :param username: str, 学号
+    """
+    from everyclass.auth import logger
+    if check_if_request_id_exist(request_id):
+        logger.warning("request_id reuses as primary key. Rejected.")
+        return False, Message.INTERNAL_ERROR
+
+    if check_if_have_registered(username):
+        logger.warn("User %s try to register for a second time. " % username)
+
+    email = username + "@csu.edu.cn"
+    token = str(uuid.uuid1())
+    send_email(email, token)
+
+    redis_client.set("auth:request_status:%s" % request_id, Message.SEND_EMAIL_SUCCESS, ex=86400)
+    request_info = "%s:%s" % (request_id, username)
+    redis_client.set("auth:email_token:%s" % token, request_info, ex=86400)
+    return True, Message.SUCCESS
