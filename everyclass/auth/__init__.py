@@ -53,10 +53,10 @@ try:
         init_pool()
 
 
-    @uwsgidecorators.postfork
-    def init_queue_worker():
-        """spawn queue worker thread for each queue"""
-        threading.Thread(target=queue_worker).start()
+    # @uwsgidecorators.postfork
+    # def init_queue_worker():
+    #     """spawn queue worker thread for each queue"""
+    #     threading.Thread(target=queue_worker).start()
 except ModuleNotFoundError:
     pass
 
