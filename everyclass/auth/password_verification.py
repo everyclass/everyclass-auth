@@ -50,7 +50,8 @@ def simulate_login_without_captcha(username: str, password: str):
             logger.warning("Alert raised when logging as {}, text is {}".format(username, alert.text))
             return False, Message.INTERNAL_ERROR
 
-        if driver.current_url == 'http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp':
+        if any(map(lambda x: driver.current_url == x,
+                   ['http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp', 'http://csujwc.its.csu.edu.cn/framework/main.jsp'])):
             return True, Message.SUCCESS
 
         # 出现红色提示窗口
@@ -62,8 +63,9 @@ def simulate_login_without_captcha(username: str, password: str):
             # 出现其他提示
             else:
                 logger.warning(
-                        "Red prompt raised when logging as {},text is {}".format(username, str(prompt[0].text)))
+                    "Red prompt raised when logging as {},text is {}".format(username, str(prompt[0].text)))
                 return False, Message.INTERNAL_ERROR
+        return False, Message.INTERNAL_ERROR
 
 
 def simulate_login(username: str, password: str):
