@@ -51,9 +51,10 @@ def simulate_login_without_captcha(username: str, password: str):
             return False, Message.INTERNAL_ERROR
 
         if any(map(lambda x: driver.current_url == x,
-                   ['http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp', 'http://csujwc.its.csu.edu.cn/framework/main.jsp'])):
+                   ['http://csujwc.its.csu.edu.cn/jsxsd/framework/xsMain.jsp', 'http://csujwc.its.csu.edu.cn/jsxsd/framework/jsMain.jsp'])):
             return True, Message.SUCCESS
-
+        else:
+            logger.info("The current_url is {}".format(driver.current_url))
         # 出现红色提示窗口
         prompt = driver.find_elements_by_css_selector("font[color='red']")
         if len(prompt) > 0:
