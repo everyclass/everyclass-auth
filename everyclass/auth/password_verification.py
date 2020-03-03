@@ -167,6 +167,8 @@ def handle_browser_register_request(request_id: str, username: str, password: st
 
     """
     from everyclass.auth import logger
+    logger.info(f"Start new thread to process handle_browser_register_request, request_id: {request_id}, username: {username}")
+
     if check_if_request_id_exist(request_id):
         logger.warning("request_id reuses as primary key. Rejected.")
         return False, Message.INTERNAL_ERROR

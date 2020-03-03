@@ -76,6 +76,8 @@ def handle_email_register_request(request_id: str, username: str):
     :param username: str, 学号
     """
     from everyclass.auth import logger
+    logger.info("Start new thread to process handle_email_register_request, request_id: {request_id}, username: {username}")
+
     if check_if_request_id_exist(request_id):
         logger.warning("request_id reuses as primary key. Rejected.")
         return False, Message.INTERNAL_ERROR

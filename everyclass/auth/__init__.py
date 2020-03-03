@@ -113,9 +113,10 @@ def queue_worker():
         request_info = re.sub('\'', '\"', request_info)
         request_info = json.loads(request_info)
         if request_info['method'] == 'password':
-            handle_browser_register_request(request_info['request_id'],
-                                            request_info['username'],
-                                            request_info['password'])
+            threading.Thread(target=handle_browser_register_request, args=(request_info['request_id'],
+                                                                           request_info['username'],
+                                                                           request_info['password'])).start()
+
         if request_info['method'] == 'email':
-            handle_email_register_request(request_info['request_id'],
-                                          request_info['username'])
+            threading.Thread(target=handle_email_register_request, args=(request_info['request_id'],
+                                                                         request_info['username'])).start()
